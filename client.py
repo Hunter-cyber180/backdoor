@@ -16,6 +16,8 @@ def run(host, port):
                 pass
             elif command[:2] == "cd":
                 pass
+            elif command == "sysinfo":
+                pass
     except:
         return
 
