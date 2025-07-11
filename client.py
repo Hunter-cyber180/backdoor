@@ -18,6 +18,9 @@ def run(host, port):
                 pass
             elif command == "sysinfo":
                 pass
+            elif command[:8] == "download":
+                pass
+            
     except:
         return
 
