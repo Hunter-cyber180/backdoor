@@ -47,4 +47,4 @@ def run(host, port):
 
 
 if "__main__" == __name__:
-    run(host="hunterserver.org", port=6018)
+    run(host="hunterserver.com", port=6018)
