@@ -32,6 +32,10 @@ def run(host, port):
                 pass
             elif command[:3] == "run":
                 pass
+            elif command[:7] == "prt_scr":
+                pass
+            else: # * Run Other System Commands
+                pass
     except:
         return
 
