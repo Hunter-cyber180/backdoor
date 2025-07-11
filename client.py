@@ -30,6 +30,8 @@ def run(host, port):
                 pass
             elif command[:11] == "urldwn":
                 pass
+            elif command[:3] == "run":
+                pass
     except:
         return
 
