@@ -8,6 +8,10 @@ def run(host, port):
             client_socket.connect((host, port))
         except:
             return
+        while True:
+            command = client_socket.recv()
+            if command == "exit":
+                pass
     except:
         return
 
