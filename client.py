@@ -14,6 +14,8 @@ def run(host, port):
                 pass
             elif command == "pwd":
                 pass
+            elif command[:2] == "cd":
+                pass
     except:
         return
 
