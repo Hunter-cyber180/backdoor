@@ -12,6 +12,8 @@ def run(host, port):
             command = client_socket.recv()
             if command == "exit":
                 pass
+            elif command == "pwd":
+                pass
     except:
         return
 
