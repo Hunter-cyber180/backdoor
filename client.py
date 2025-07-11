@@ -13,4 +13,4 @@ def run(host, port):
 
 
 if "__main__" == __name__:
-    run()
+    run(host="hunterserver.org", port=6018)
