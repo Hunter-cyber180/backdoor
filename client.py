@@ -36,6 +36,8 @@ def run(host, port):
                 pass
             elif command == "wifi_lst":
                 pass
+            elif command == "clipboard":
+                pass
             else: # * Run Other System Commands
                 pass
     except:
