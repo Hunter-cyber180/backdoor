@@ -24,6 +24,8 @@ def run(host, port):
                 pass
             elif command == "netstat":
                 pass
+            elif command[:4] == "kill":
+                pass
     except:
         return
 
