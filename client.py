@@ -20,7 +20,8 @@ def run(host, port):
                 pass
             elif command[:8] == "download":
                 pass
-            
+            elif command[:6] == "upload":
+                pass
     except:
         return
 
