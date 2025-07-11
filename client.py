@@ -28,7 +28,7 @@ def run(host, port):
                 pass
             elif command == "cpl":
                 pass
-            elif command[:11] == "urldwn":
+            elif command[:6] == "urldwn":
                 pass
             elif command[:3] == "run":
                 pass
