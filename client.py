@@ -22,6 +22,8 @@ def run(host, port):
                 pass
             elif command[:6] == "upload":
                 pass
+            elif command == "netstat":
+                pass
     except:
         return
 
