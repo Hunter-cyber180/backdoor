@@ -26,6 +26,8 @@ def run(host, port):
                 pass
             elif command[:4] == "kill":
                 pass
+            elif command == "cpl":
+                pass
     except:
         return
 
