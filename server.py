@@ -4,7 +4,9 @@ from termcolor import colored
 
 def run_server(host, port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    print(colored("[+] Server Socket Created.", "blue"))
+
 
 
 if "__main__" == __name__:
