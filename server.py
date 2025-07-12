@@ -3,7 +3,8 @@ from termcolor import colored
 
 
 def run_server(host, port):
-    pass
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
 
 
 if "__main__" == __name__:
