@@ -20,3 +20,25 @@ def socket_send(sock: socket.socket, data: Union[str, bytes]) -> None:
         chunk = data[sent : sent + CHUNK_SIZE]
         sock.sendall(chunk)
         sent += len(chunk)
+
+
+def socket_recv(sock: socket.socket, decode_as_utf8: bool = True) -> Union[bytes, str]:
+
+    length_data = b""
+    while len(length_data) < 5:
+        chunk = sock.recv(5 - len(length_data))
+        if not chunk:
+            raise ConnectionError("Connection closed while receiving length prefix")
+        length_data += chunk
+
+    length = int.from_bytes(length_data, "big")
+
+    received_data = b""
+    while len(received_data) < length:
+        remaining_bytes = length - len(received_data)
+        chunk = sock.recv(1024 if remaining_bytes > 1024 else remaining_bytes)
+        if not chunk:
+            raise ConnectionError("Connection closed before receiving all data")
+        received_data += chunk
+
+    return received_data.decode("utf-8") if decode_as_utf8 else received_data
