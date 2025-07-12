@@ -9,6 +9,9 @@ def run_server(host, port):
     server_socket.bind((host, port))
     server_socket.listen(5)
     print(colored("[+] Server Is Listening...", "blue"))
+    client_socket, client_address = server_socket.accept()
+    print(colored(f"[+] Connected To {str(client_address)} Client", "green"))
+
 
 if "__main__" == __name__:
     run_server(host="0.0.0.0", port=6018)
