@@ -24,12 +24,21 @@ def run_server(host, port):
         # * cd Command
         if command[:2] == "cd":
             continue
+        # * Download Command
         elif command[:8] == "download":
             pass
+        # * Prt Scr Command
         elif command[:7] == "prt_scr":
             pass
+        # * Upload Command
         elif command[:6] == "upload":
             pass
+        # * Other Commands
+        else:
+            pass
+
+    client_socket.close()
+    server_socket.close()
 
 
 if "__main__" == __name__:
