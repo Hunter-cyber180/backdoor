@@ -26,7 +26,8 @@ def run_server(host, port):
             continue
         elif command[:8] == "download":
             pass
-        
+        elif command[:7] == "prt_scr":
+            pass
         
         
 
