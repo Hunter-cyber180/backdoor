@@ -28,8 +28,8 @@ def run_server(host, port):
             pass
         elif command[:7] == "prt_scr":
             pass
-        
-        
+        elif command[:6] == "upload":
+            pass
 
 
 if "__main__" == __name__:
