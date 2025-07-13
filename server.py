@@ -21,7 +21,9 @@ def run_server(host, port):
         # * Exit Command
         if command == "exit":
             break
-        
+        # * cd Command
+        if command[:2] == "cd":
+            continue
         
         
         
