@@ -24,6 +24,8 @@ def run_server(host, port):
         # * cd Command
         if command[:2] == "cd":
             continue
+        elif command[:8] == "download":
+            pass
         
         
         
