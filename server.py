@@ -18,6 +18,11 @@ def run_server(host, port):
         if command.rstrip() == "":
             continue
         socket_send(client_socket, command)
+        # * Exit Command
+        if command == "exit":
+            break
+        
+        
         
         
 
