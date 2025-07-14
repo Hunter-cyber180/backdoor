@@ -1,7 +1,7 @@
 from socket_handlers import *
 from urllib.parse import unquote
 import os, base64, binascii, requests
-from pathvalidate import sanitize_filename
+from pathvalidate import sanitize_filename, sanitize_filepath
 
 
 def pwd(socket):
@@ -67,18 +67,23 @@ def urldownload(url, max_size_mb=10, timeout=30):
             head_response.raise_for_status()
 
             if head_response.status_code != 200:
-                return f"Error: Server returned status code {head_response.status_code}"
+                socket_send(
+                    f"Error: Server returned status code {head_response.status_code}"
+                )
+                return "[!] Error"
 
             content_type = head_response.headers.get("Content-Type", "")
             if not content_type.startswith(("image/", "application/octet-stream")):
-                return f"Error: Unsupported content type: {content_type}"
+                socket_send(f"Error: Unsupported content type: {content_type}")
+                return "[!] Error"
 
             content_length = int(head_response.headers.get("Content-Length", 0))
             max_size_bytes = max_size_mb * 1024 * 1024
             if content_length > max_size_bytes:
-                return (
+                socket_send(
                     f"Error: File size exceeds maximum allowed size ({max_size_mb}MB)"
                 )
+                return "[!] Error"
 
         with requests.get(url, stream=True, timeout=timeout) as response:
             response.raise_for_status()
@@ -98,15 +103,16 @@ def urldownload(url, max_size_mb=10, timeout=30):
 
                         if downloaded_size > max_size_bytes:
                             os.remove(file_name)
-                            return f"Error: File size exceeded during download"
-
-            return (
+                            socket_send(f"Error: File size exceeded during download")
+                            return "[!] Error"
+            socket_send(
                 f"'{file_name}' successfully downloaded ({downloaded_size/1024:.2f} KB)"
             )
+            return True
 
     except requests.exceptions.RequestException as e:
-        return f"Network error: {str(e)}"
+        return f"[!] Error: Network error: {str(e)}"
     except IOError as e:
-        return f"File system error: {str(e)}"
+        return f"[!] Error: File system error: {str(e)}"
     except Exception as e:
-        return f"Unexpected error: {str(e)}"
+        return f"[!] Error: Unexpected error: {str(e)}"
