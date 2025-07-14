@@ -116,3 +116,46 @@ def urldownload(url, max_size_mb=10, timeout=30):
         socket_send(f"[!] Error: File system error: {str(e)}")
     except Exception as e:
         socket_send(f"[!] Error: Unexpected error: {str(e)}")
+
+
+def send_file_to_server(sock, file_path, max_size_mb=10):
+    try:
+        file_path = sanitize_filepath(file_path)
+        if not os.path.exists(file_path):
+            socket_send(sock, "Error: File Not Found!")
+            return "[!] Error"
+
+        if not os.path.isfile(file_path):
+            socket_send(sock, "Error: Path is not a file!")
+            return "[!] Error"
+
+        file_size = os.path.getsize(file_path)
+        max_size_bytes = max_size_mb * 1024 * 1024
+        if file_size > max_size_bytes:
+            socket_send(sock, f"Error: File size exceeds {max_size_mb}MB limit!")
+            return "[!] Error"
+
+        chunk_size = 8192  # 8KB
+        with open(file_path, "rb") as fp:
+            file_info = {
+                "name": os.path.basename(file_path),
+                "size": file_size,
+                "chunks": (file_size // chunk_size) + 1,
+            }
+            socket_send(sock, base64.b64encode(str(file_info).encode()))
+
+            for chunk in iter(lambda: fp.read(chunk_size), b""):
+                socket_send(sock, base64.b64encode(chunk))
+
+        socket_send(sock, "[+] File Transfer Complete")
+        return True
+
+    except PermissionError:
+        socket_send(sock, "[!] Error: Permission denied!")
+        return "[!] Error"
+    except IOError as e:
+        socket_send(sock, f"[!] Error: I/O operation failed - {str(e)}")
+        return "[!] Error"
+    except Exception as e:
+        socket_send(sock, f"[!] Error: Unexpected error - {str(e)}")
+        return "[!] Error"
