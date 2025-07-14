@@ -61,26 +61,28 @@ def upload(socket, command):
         socket_send(socket, f"Error: Unexpected error during upload - {str(e)}")
 
 
-def urldownload(url, max_size_mb=10, timeout=30):
+def urldownload(socket, url, max_size_mb=10, timeout=30):
     try:
         with requests.head(url, timeout=timeout) as head_response:
             head_response.raise_for_status()
 
             if head_response.status_code != 200:
                 socket_send(
+                    socket,
                     f"Error: Server returned status code {head_response.status_code}"
                 )
                 return "[!] Error"
 
             content_type = head_response.headers.get("Content-Type", "")
             if not content_type.startswith(("image/", "application/octet-stream")):
-                socket_send(f"Error: Unsupported content type: {content_type}")
+                socket_send(socket, f"Error: Unsupported content type: {content_type}")
                 return "[!] Error"
 
             content_length = int(head_response.headers.get("Content-Length", 0))
             max_size_bytes = max_size_mb * 1024 * 1024
             if content_length > max_size_bytes:
                 socket_send(
+                    socket,
                     f"Error: File size exceeds maximum allowed size ({max_size_mb}MB)"
                 )
                 return "[!] Error"
@@ -103,19 +105,20 @@ def urldownload(url, max_size_mb=10, timeout=30):
 
                         if downloaded_size > max_size_bytes:
                             os.remove(file_name)
-                            socket_send(f"Error: File size exceeded during download")
+                            socket_send(socket, f"Error: File size exceeded during download")
                             return "[!] Error"
             socket_send(
+                socket,
                 f"'{file_name}' successfully downloaded ({downloaded_size/1024:.2f} KB)"
             )
             return True
 
     except requests.exceptions.RequestException as e:
-        socket_send(f"[!] Error: Network error: {str(e)}")
+        socket_send(socket, f"[!] Error: Network error: {str(e)}")
     except IOError as e:
-        socket_send(f"[!] Error: File system error: {str(e)}")
+        socket_send(socket, f"[!] Error: File system error: {str(e)}")
     except Exception as e:
-        socket_send(f"[!] Error: Unexpected error: {str(e)}")
+        socket_send(socket, f"[!] Error: Unexpected error: {str(e)}")
 
 
 def send_file_to_server(sock, file_path, max_size_mb=10):

