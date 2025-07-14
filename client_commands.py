@@ -61,7 +61,7 @@ def upload(socket, command):
         socket_send(socket, f"Error: Unexpected error during upload - {str(e)}")
 
 
-def download(url, max_size_mb=10, timeout=30):
+def urldownload(url, max_size_mb=10, timeout=30):
     try:
         with requests.head(url, timeout=timeout) as head_response:
             head_response.raise_for_status()
