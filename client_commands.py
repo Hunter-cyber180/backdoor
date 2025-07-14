@@ -111,8 +111,8 @@ def urldownload(url, max_size_mb=10, timeout=30):
             return True
 
     except requests.exceptions.RequestException as e:
-        return f"[!] Error: Network error: {str(e)}"
+        socket_send(f"[!] Error: Network error: {str(e)}")
     except IOError as e:
-        return f"[!] Error: File system error: {str(e)}"
+        socket_send(f"[!] Error: File system error: {str(e)}")
     except Exception as e:
-        return f"[!] Error: Unexpected error: {str(e)}"
+        socket_send(f"[!] Error: Unexpected error: {str(e)}")
