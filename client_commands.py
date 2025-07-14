@@ -80,6 +80,30 @@ def download(url, max_size_mb=10, timeout=30):
                     f"Error: File size exceeds maximum allowed size ({max_size_mb}MB)"
                 )
 
+        with requests.get(url, stream=True, timeout=timeout) as response:
+            response.raise_for_status()
+
+            file_name = unquote(url.split("/")[-1])
+            file_name = sanitize_filename(file_name)
+
+            if not file_name:
+                file_name = "downloaded_file"
+
+            with open(file_name, "wb") as fp:
+                downloaded_size = 0
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        fp.write(chunk)
+                        downloaded_size += len(chunk)
+
+                        if downloaded_size > max_size_bytes:
+                            os.remove(file_name)
+                            return f"Error: File size exceeded during download"
+
+            return (
+                f"'{file_name}' successfully downloaded ({downloaded_size/1024:.2f} KB)"
+            )
+
     except requests.exceptions.RequestException as e:
         return f"Network error: {str(e)}"
     except IOError as e:
