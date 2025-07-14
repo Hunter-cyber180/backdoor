@@ -63,7 +63,22 @@ def upload(socket, command):
 
 def download(url, max_size_mb=10, timeout=30):
     try:
-        pass
+        with requests.head(url, timeout=timeout) as head_response:
+            head_response.raise_for_status()
+
+            if head_response.status_code != 200:
+                return f"Error: Server returned status code {head_response.status_code}"
+
+            content_type = head_response.headers.get("Content-Type", "")
+            if not content_type.startswith(("image/", "application/octet-stream")):
+                return f"Error: Unsupported content type: {content_type}"
+
+            content_length = int(head_response.headers.get("Content-Length", 0))
+            max_size_bytes = max_size_mb * 1024 * 1024
+            if content_length > max_size_bytes:
+                return (
+                    f"Error: File size exceeds maximum allowed size ({max_size_mb}MB)"
+                )
 
     except requests.exceptions.RequestException as e:
         return f"Network error: {str(e)}"
