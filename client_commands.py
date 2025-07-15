@@ -1,7 +1,8 @@
 from socket_handlers import *
 from urllib.parse import unquote
-import os, base64, binascii, requests
+import os, base64, binascii, requests, ctypes
 from pathvalidate import sanitize_filename, sanitize_filepath
+from typing import Tuple
 
 
 def pwd(socket):
@@ -69,7 +70,7 @@ def urldownload(socket, url, max_size_mb=10, timeout=30):
             if head_response.status_code != 200:
                 socket_send(
                     socket,
-                    f"Error: Server returned status code {head_response.status_code}"
+                    f"Error: Server returned status code {head_response.status_code}",
                 )
                 return "[!] Error"
 
@@ -83,7 +84,7 @@ def urldownload(socket, url, max_size_mb=10, timeout=30):
             if content_length > max_size_bytes:
                 socket_send(
                     socket,
-                    f"Error: File size exceeds maximum allowed size ({max_size_mb}MB)"
+                    f"Error: File size exceeds maximum allowed size ({max_size_mb}MB)",
                 )
                 return "[!] Error"
 
@@ -105,11 +106,13 @@ def urldownload(socket, url, max_size_mb=10, timeout=30):
 
                         if downloaded_size > max_size_bytes:
                             os.remove(file_name)
-                            socket_send(socket, f"Error: File size exceeded during download")
+                            socket_send(
+                                socket, f"Error: File size exceeded during download"
+                            )
                             return "[!] Error"
             socket_send(
                 socket,
-                f"'{file_name}' successfully downloaded ({downloaded_size/1024:.2f} KB)"
+                f"'{file_name}' successfully downloaded ({downloaded_size/1024:.2f} KB)",
             )
             return True
 
@@ -162,3 +165,18 @@ def send_file_to_server(sock, file_path, max_size_mb=10):
     except Exception as e:
         socket_send(sock, f"[!] Error: Unexpected error - {str(e)}")
         return "[!] Error"
+
+
+def check_admin_privileges() -> Tuple[bool, str]:
+    try:
+        if os.name == "nt":
+            try:
+                is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+                if is_admin:
+                    return True, "[+] Administrator Privileges (Windows API Check)"
+            except (AttributeError, OSError):
+                pass
+
+    except Exception as e:
+        error_type = type(e).__name__
+        return False, f"[!] Privilege Check Error: {error_type}"
