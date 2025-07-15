@@ -188,7 +188,13 @@ def check_admin_privileges() -> Tuple[bool, str]:
             os.remove(test_file)
             return True, "[+] Administrator Privileges (System Directory Access)"
         except (IOError, OSError, PermissionError) as e:
-            pass
+            if os.path.exists(test_file):
+                try:
+                    os.remove(test_file)
+                except:
+                    pass
+            error_type = type(e).__name__
+            return False, f"[+] User Privileges (Access Denied: {error_type})"
 
     except Exception as e:
         error_type = type(e).__name__
