@@ -225,6 +225,15 @@ def execute_program(socket, command: str) -> Tuple[bool, str]:
             stdin=subprocess.PIPE,
         )
 
+        if process.poll() is not None:
+            _, stderr = process.communicate()
+            err_msg = stderr.decode("utf-8", errors="replace").strip()
+            socket_send(socket, f"[!] Failed to start: {err_msg or 'Unknown error'}")
+            return False
+
+        socket_send(socket, "[+] Program started successfully")
+        return True
+
     except FileNotFoundError:
         socket_send(socket, "[!] Program not found")
         return False
