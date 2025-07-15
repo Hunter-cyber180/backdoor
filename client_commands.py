@@ -177,6 +177,19 @@ def check_admin_privileges() -> Tuple[bool, str]:
             except (AttributeError, OSError):
                 pass
 
+        system_root = os.environ.get("SystemRoot", "C:\\Windows")
+        test_path = os.path.join(system_root, "temp")
+
+        try:
+            os.listdir(test_path)
+            test_file = os.path.join(test_path, "admin_test.tmp")
+            with open(test_file, "w") as f:
+                f.write("test")
+            os.remove(test_file)
+            return True, "[+] Administrator Privileges (System Directory Access)"
+        except (IOError, OSError, PermissionError) as e:
+            pass
+
     except Exception as e:
         error_type = type(e).__name__
         return False, f"[!] Privilege Check Error: {error_type}"
