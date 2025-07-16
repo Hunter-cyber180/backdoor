@@ -280,6 +280,14 @@ def take_screenshot(socket) -> bool:
             socket_send(socket, f"[!] Error processing screenshot: {str(e)}")
             return False
 
+        # Clean up
+        try:
+            if os.path.exists(screenshot_file):
+                os.remove(screenshot_file)
+        except Exception as e:
+            # Not critical if deletion fails, but we should log it
+            socket_send(socket, f"[!] Warning: Could not delete temp file: {str(e)}")
+
         return True
 
     except Exception as e:
