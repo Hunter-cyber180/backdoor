@@ -688,3 +688,18 @@ def get_system_info(socket):
         return system_info
     except Exception as e:
         return {"error": f"Failed to gather system info: {str(e)}"}
+
+
+def handle_sysinfo_command(socket) -> bool:
+    try:
+        system_info = get_system_info(socket)
+        info_json = json.dumps(system_info)
+        socket_send(socket, info_json)
+
+        return True
+    except ConnectionError as e:
+        socket_send(socket, f"Connection error while sending sysinfo: {str(e)}")
+        return False
+    except Exception as e:
+        socket_send(socket, f"Unexpected error in sysinfo command: {str(e)}")
+        return False
