@@ -11,6 +11,40 @@ def pwd(socket):
 
 
 def upload(socket, command):
+    """
+    Handles file upload from a client socket to the server.
+
+    This function receives a file path and base64-encoded file data from a client,
+    validates the path, decodes the data, and saves the file to the specified location.
+    It includes security checks to prevent directory traversal and handles various error cases.
+
+    Args:
+        socket: The connected socket object for communication with the client.
+        command: A string containing the destination file path for the upload.
+
+    Returns:
+        str: A status message indicating success or failure:
+            - "[!] Error" if any error occurs during the process
+            - No explicit return on success (only sends success message via socket)
+
+    Raises:
+        Various exceptions may occur during file operations or socket communication,
+        but all are caught and handled internally with appropriate error messages.
+
+    Security Notes:
+        - Rejects paths containing '..', '~', '/' or '\' to prevent directory traversal
+        - Validates file doesn't exist before writing to prevent overwrites
+        - Creates parent directories if needed (with exist_ok=True)
+        - Verifies file size after write to ensure complete transfer
+        - Cleans up partial files if errors occur
+
+    Example client-server interaction:
+        1. Client sends: "/path/to/file.txt"
+        2. Server validates path
+        3. Client sends base64-encoded file data
+        4. Server decodes and saves file
+        5. Server responds with success/error message
+    """
     try:
         # Get file path from command (safer than direct slicing)
         file_path = command.strip()
