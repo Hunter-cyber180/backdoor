@@ -305,7 +305,7 @@ def check_admin_privileges(socket) -> bool:
     This function performs privilege checks through:
     1. Windows API check (for Windows systems)
     2. Filesystem access test (writing to protected system directory)
-    
+
     The function provides detailed status messages through the socket connection.
 
     Args:
@@ -383,6 +383,55 @@ def check_admin_privileges(socket) -> bool:
 
 
 def execute_program(socket, command: str) -> bool:
+    """
+    Executes a program/command in a subprocess and reports the status via socket.
+
+    This function handles program execution with proper error handling and status reporting.
+    It supports both direct commands and 'run' prefixed commands (e.g., 'run notepad.exe').
+
+    Args:
+        socket: Connected socket object for status/error communication
+        command: The command to execute (with optional 'run ' prefix)
+
+    Returns:
+        bool: True if program started successfully, False otherwise
+
+    Features:
+        - Handles 'run' prefix automatically (strips it if present)
+        - Validates for empty commands
+        - Captures and reports stderr if process fails immediately
+        - Uses secure subprocess execution (shell=False)
+        - Provides real-time status feedback via socket
+
+    Error Handling:
+        - FileNotFoundError: Program doesn't exist
+        - PermissionError: Insufficient privileges
+        - Other exceptions: Generic execution failure
+        (All errors are properly formatted and sent via socket)
+
+    Security Notes:
+        - Uses shell=False to prevent shell injection
+        - Doesn't support shell features (pipes, redirects, etc.)
+        - Properly encodes/decodes process output
+
+    Message Protocol:
+        Success:
+            "[+] Program started successfully"
+        Errors:
+            "[!] Empty command"
+            "[!] Program not found"
+            "[!] Permission denied"
+            "[!] Failed to start: <error_details>"
+            "[!] Execution failed (<error_type>)"
+
+    Example:
+        >>> execute_program(sock, "notepad.exe")
+        True  # If successful
+        >>> execute_program(sock, "run /bin/ls")
+        True  # If successful
+        >>> execute_program(sock, "invalid_cmd")
+        False  # Sends appropriate error message
+    """
     try:
         executable = command[4:] if command.startswith("run ") else command
 
