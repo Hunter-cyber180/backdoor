@@ -205,6 +205,57 @@ def urldownload(socket, url, max_size_mb=10, timeout=30):
 
 
 def send_file_to_server(sock, file_path, max_size_mb=10):
+    """
+    Sends a file to a server over a socket connection with security checks and progress tracking.
+
+    This function performs the following operations:
+    1. Validates and sanitizes the file path
+    2. Verifies file existence and type (regular file)
+    3. Checks file size against maximum allowed limit
+    4. Sends file metadata (name, size, chunks) as base64-encoded JSON
+    5. Transmits file content in 8KB chunks as base64-encoded data
+    6. Provides completion/error feedback through the socket
+
+    Args:
+        sock: Connected socket object for server communication
+        file_path: Path to the file to be sent (str)
+        max_size_mb: Maximum allowed file size in megabytes (default: 10)
+
+    Returns:
+        bool: True if file transfer succeeds
+        str: "[!] Error" string if any error occurs
+
+    Raises:
+        PermissionError: If file access is denied
+        IOError: For filesystem-related errors
+        Exception: For unexpected errors (all caught and handled)
+
+    Security Features:
+        - Sanitizes file path before processing
+        - Validates file type (regular files only)
+        - Enforces maximum file size limit
+        - Transmits data in base64-encoded format
+        - Uses chunked transfer to manage memory usage
+
+    Protocol Details:
+        - First sends file metadata as base64-encoded JSON containing:
+          * name: Filename
+          * size: Total file size in bytes
+          * chunks: Total number of 8KB chunks
+        - Then streams file content in base64-encoded 8KB chunks
+        - Ends with completion message
+
+    Example:
+        Successful transfer:
+            >>> send_file_to_server(sock, "/path/to/file.txt")
+            True
+            # Sends metadata, chunks, then completion message
+
+        Failed transfer (file too large):
+            >>> send_file_to_server(sock, "/path/to/large_file.iso", max_size_mb=5)
+            "[!] Error"
+            # Sends size limit error message
+    """
     try:
         file_path = sanitize_filepath(file_path)
         if not os.path.exists(file_path):
