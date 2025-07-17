@@ -98,6 +98,51 @@ def upload(socket, command):
 
 
 def urldownload(socket, url, max_size_mb=10, timeout=30):
+    """
+    Downloads a file from a given URL and saves it locally with security checks.
+
+    This function performs the following operations:
+    1. Validates the URL by sending a HEAD request first
+    2. Checks server response status and content type
+    3. Verifies file size against allowed maximum
+    4. Sanitizes the filename
+    5. Downloads the file in chunks with progress tracking
+    6. Handles various error conditions appropriately
+
+    Args:
+        socket: Connected socket object for client communication
+        url: URL of the file to download (str)
+        max_size_mb: Maximum allowed file size in megabytes (default: 10)
+        timeout: Connection/read timeout in seconds (default: 30)
+
+    Returns:
+        bool: True if download succeeds
+        str: "[!] Error" string if any error occurs
+
+    Raises:
+        requests.exceptions.RequestException: For network-related errors
+        IOError: For filesystem-related errors
+        Exception: For unexpected errors (all caught and handled)
+
+    Security Features:
+        - Validates content type (only allows images and octet-stream)
+        - Enforces maximum file size limit
+        - Sanitizes filename before saving
+        - Downloads in chunks to prevent memory issues
+        - Verifies size during download to prevent overflow
+        - Cleans up partial files if download fails
+
+    Example:
+        Successful download:
+            >>> urldownload(socket, "http://example.com/image.jpg")
+            True
+            # Sends success message via socket
+
+        Failed download (size exceeded):
+            >>> urldownload(socket, "http://example.com/large_file.zip", max_size_mb=5)
+            "[!] Error"
+            # Sends error message via socket
+    """
     try:
         with requests.head(url, timeout=timeout) as head_response:
             head_response.raise_for_status()
