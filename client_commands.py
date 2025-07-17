@@ -299,6 +299,48 @@ def send_file_to_server(sock, file_path, max_size_mb=10):
 
 
 def check_admin_privileges(socket) -> bool:
+    """
+    Checks if the current process has administrator/root privileges using multiple verification methods.
+
+    This function performs privilege checks through:
+    1. Windows API check (for Windows systems)
+    2. Filesystem access test (writing to protected system directory)
+    
+    The function provides detailed status messages through the socket connection.
+
+    Args:
+        socket: Connected socket object for sending status/error messages
+
+    Returns:
+        bool: True if admin privileges are detected, False otherwise
+
+    Behavior by OS:
+        Windows:
+            - First attempts Windows API check (IsUserAnAdmin)
+            - Falls back to filesystem test if API unavailable
+        Unix-like:
+            - Performs filesystem test on system directories
+
+    Security Notes:
+        - Uses multiple verification methods for reliability
+        - Cleans up test files if created
+        - Never raises exceptions (all caught and handled)
+        - Provides detailed feedback through socket
+
+    Message Types:
+        Success:
+            - "[+] Administrator Privileges (Windows API Check)"
+            - "[+] Administrator Privileges (System Directory Access)"
+        Failure:
+            - "[+] User Privileges (Access Denied: <error_type>)"
+            - "[!] Privilege Check Error: <error_type>"
+
+    Example Usage:
+        >>> if check_admin_privileges(sock):
+        ...     # Perform admin operations
+        ... else:
+        ...     # Request elevation or exit
+    """
     try:
         if os.name == "nt":
             try:
