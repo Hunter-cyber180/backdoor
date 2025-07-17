@@ -571,6 +571,61 @@ def take_screenshot(socket) -> bool:
 
 
 def execute_system_command(socket, command: str, timeout: int = 30) -> bool:
+    """
+    Executes a system command with timeout protection and returns output via socket.
+
+    This function provides a secure way to execute shell commands with:
+    - Input validation
+    - Timeout protection
+    - Comprehensive error handling
+    - Real-time output capture
+
+    Args:
+        socket: Connected socket for command output and error reporting
+        command: The system command to execute (must be non-empty string)
+        timeout: Maximum execution time in seconds (default: 30)
+
+    Returns:
+        bool: True if command executed successfully (regardless of exit code),
+              False if execution failed or timed out
+
+    Features:
+        - Validates command input before execution
+        - Uses subprocess with shell=True for command execution
+        - Captures both stdout and stderr streams
+        - Enforces timeout to prevent hanging processes
+        - Automatically terminates timed-out processes
+        - Provides detailed error reporting through socket
+
+    Security Considerations:
+        - Uses shell=True (be cautious with untrusted input)
+        - Limits maximum execution time
+        - Properly handles process termination
+        - Sanitizes error messages before transmission
+
+    Error Handling:
+        - Invalid command input
+        - Command not found (FileNotFoundError)
+        - Process timeout (TimeoutExpired)
+        - Subprocess execution errors
+        - Unexpected runtime errors
+
+    Message Protocol:
+        Success:
+            (Raw command output sent via socket)
+        Errors:
+            "[!] Error: Invalid command"
+            "[!] Error: Command timed out"
+            "[!] Error: Command not found"
+            "[!] Subprocess error: <details>"
+            "[!] Unexpected error: <details>"
+
+    Example:
+        >>> execute_system_command(sock, "ls -l", timeout=10)
+        True  # If command executes within timeout
+        >>> execute_system_command(sock, "sleep 60", timeout=5)
+        False  # Will timeout after 5 seconds
+    """
     try:
         # Basic command validation
         if not command or not isinstance(command, str):
