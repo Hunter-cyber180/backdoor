@@ -833,7 +833,26 @@ def get_wifi_list(socket: socket.socket) -> bool:
                     return False
 
         elif system_os == "Darwin":
-            pass
+            result = subprocess.run(
+                [
+                    "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport",
+                    "-s",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            if result.returncode == 0:
+                socket_send(socket, result.stdout)
+                return True
+            else:
+                socket_send(socket, "Failed to get Wi-Fi list on macOS")
+                return False
+
+        else:
+            socket_send(socket, f"Unsupported OS: {system_os}")
+            return False
 
     except subprocess.CalledProcessError as e:
         socket_send(socket, f"Error getting Wi-Fi list: {str(e)}")
