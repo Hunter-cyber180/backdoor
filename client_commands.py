@@ -755,5 +755,16 @@ def kill_process(socket: socket.socket, command: str) -> bool:
                     socket, f"Failed to kill process {pid}. Error: {result.stderr}"
                 )
                 return False
-    except:
-        pass
+
+    except subprocess.CalledProcessError as e:
+        socket_send(socket, f"Kill command failed: {str(e)}")
+        return False
+    except FileNotFoundError:
+        socket_send(socket, "kill command not found (this might not work on Windows)")
+        return False
+    except PermissionError:
+        socket_send(socket, f"Permission denied: Cannot kill process {pid}")
+        return False
+    except Exception as e:
+        socket_send(socket, f"Unexpected error while killing process: {str(e)}")
+        return False
