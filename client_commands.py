@@ -703,3 +703,23 @@ def handle_sysinfo_command(socket) -> bool:
     except Exception as e:
         socket_send(socket, f"Unexpected error in sysinfo command: {str(e)}")
         return False
+
+
+def execute_netstat(socket: socket.socket) -> bool:
+    try:
+        result = subprocess.run(
+            ["netstat", "-tuln"], capture_output=True, text=True, check=True
+        )
+
+        if result.returncode == 0:
+            output = result.stdout
+            if not output:
+                socket_send(socket, "No netstat output available")
+                return False
+        else:
+            socket_send(socket, f"netstat command failed with error:\n{result.stderr}")
+            return False
+
+        socket_send(socket, output)
+    except:
+        pass
