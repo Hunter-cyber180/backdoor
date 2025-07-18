@@ -768,3 +768,40 @@ def kill_process(socket: socket.socket, command: str) -> bool:
     except Exception as e:
         socket_send(socket, f"Unexpected error while killing process: {str(e)}")
         return False
+
+
+def get_wifi_list(socket: socket.socket) -> bool:
+    try:
+        system_os = platform.system()
+        wifi_list = ""
+
+        if system_os == "Windows":
+            result = subprocess.run(
+                ["netsh", "wlan", "show", "networks"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            if result.returncode == 0:
+                socket_send(socket, result.stdout)
+                return True
+            else:
+                socket_send(socket, "Failed to get Wi-Fi list on Windows")
+                return False
+
+        elif system_os == "Linux":
+            pass
+
+        elif system_os == "Darwin":
+            pass
+
+    except subprocess.CalledProcessError as e:
+        socket_send(socket, f"Error getting Wi-Fi list: {str(e)}")
+        return False
+    except PermissionError:
+        socket_send(socket, "Permission denied: Need admin privileges")
+        return False
+    except Exception as e:
+        socket_send(socket, f"Unexpected error: {str(e)}")
+        return False
