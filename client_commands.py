@@ -791,7 +791,46 @@ def get_wifi_list(socket: socket.socket) -> bool:
                 return False
 
         elif system_os == "Linux":
-            pass
+            try:
+                result = subprocess.run(
+                    ["nmcli", "-t", "-f", "SSID,SIGNAL", "device", "wifi", "list"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+
+                if result.returncode == 0:
+                    wifi_list = "SSID\t\tSIGNAL\n"
+                    wifi_list += "----------------------------\n"
+                    for line in result.stdout.split("\n"):
+                        if line:
+                            parts = line.split(":")
+                            if len(parts) >= 2:
+                                ssid = parts[0]
+                                signal = parts[1]
+                                wifi_list += f"{ssid}\t\t{signal}%\n"
+                    socket_send(socket, wifi_list)
+                    return True
+                else:
+                    socket_send(socket, "Failed to get Wi-Fi list using nmcli")
+                    return False
+
+            except FileNotFoundError:
+                result = subprocess.run(
+                    ["iwlist", "scan"], capture_output=True, text=True, check=True
+                )
+
+                if result.returncode == 0:
+                    wifi_list = "Available Wi-Fi Networks:\n"
+                    for line in result.stdout.split("\n"):
+                        if "ESSID:" in line:
+                            ssid = line.split('"')[1]
+                            wifi_list += f"- {ssid}\n"
+                    socket_send(socket, wifi_list)
+                    return True
+                else:
+                    socket_send(socket, "Failed to get Wi-Fi list using iwlist")
+                    return False
 
         elif system_os == "Darwin":
             pass
