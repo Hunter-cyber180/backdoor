@@ -721,5 +721,15 @@ def execute_netstat(socket: socket.socket) -> bool:
             return False
 
         socket_send(socket, output)
-    except:
-        pass
+
+    except subprocess.CalledProcessError as e:
+        socket_send(socket, f"netstat command execution failed: {str(e)}")
+        return False
+    except FileNotFoundError:
+        socket_send(
+            socket, "netstat command not found (this might not work on Windows)"
+        )
+        return False
+    except Exception as e:
+        socket_send(socket, f"Unexpected error while running netstat: {str(e)}")
+        return False
