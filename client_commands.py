@@ -887,5 +887,14 @@ def send_clipboard(
             socket_send(socket, json_data)
             return True
 
-        except:
-            pass
+        except socket.error as e:
+            retry_count += 1
+            socket_send(
+                socket,
+                f"Error in sending clipboard (retry: {retry_count}/{max_retries}): {e}",
+            )
+            if retry_count < max_retries:
+                sleep(retry_delay)
+
+    socket_send(socket, "Sending clipboard to server was not successfull")
+    return False
