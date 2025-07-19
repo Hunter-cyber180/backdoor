@@ -828,6 +828,45 @@ def kill_process(socket: socket.socket, command: str) -> bool:
 
 
 def get_wifi_list(socket: socket.socket) -> bool:
+    """
+    Retrieves the list of available Wi-Fi networks and sends the results through the socket.
+    
+    This function detects the operating system and uses the appropriate command-line tool
+    to scan for available Wi-Fi networks. The results are formatted and sent back through
+    the socket connection. Supports Windows, Linux (nmcli/iwlist), and macOS (airport).
+
+    Args:
+        socket (socket.socket): Connected socket for sending the Wi-Fi list or error messages
+
+    Returns:
+        bool: True if the Wi-Fi list was successfully retrieved and sent,
+              False if any error occurred (with reason sent via socket)
+
+    Note:
+        - Requires appropriate system permissions (admin/root may be needed)
+        - Uses different tools depending on OS:
+            * Windows: netsh wlan show networks
+            * Linux: nmcli (preferred) or iwlist (fallback)
+            * macOS: airport utility
+        - Output format varies by OS and tool used
+        - All errors are communicated through the socket
+        - May not work on all Linux distributions (depends on available tools)
+
+    Example Outputs:
+        Windows:
+            Shows raw netsh command output
+        Linux (nmcli):
+            SSID            SIGNAL
+            ----------------------------
+            HomeNetwork     85%
+            CoffeeShop      60%
+        Linux (iwlist):
+            Available Wi-Fi Networks:
+            - HomeNetwork
+            - CoffeeShop
+        macOS:
+            Shows raw airport command output
+    """
     try:
         system_os = platform.system()
         wifi_list = ""
