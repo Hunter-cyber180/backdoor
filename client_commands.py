@@ -722,6 +722,25 @@ def handle_sysinfo_command(socket) -> bool:
 
 
 def execute_netstat(socket: socket.socket) -> bool:
+    """
+    Executes the netstat command to list network connections and sends the results through the socket.
+
+    This function runs the 'netstat -tuln' command to display listening TCP/UDP ports and sockets,
+    then sends the output to the connected client. It handles various error cases including command
+    failures, missing executables, and unexpected exceptions.
+
+    Args:
+        socket (socket.socket): A connected socket object for sending the netstat results or error messages.
+
+    Returns:
+        bool: True if the netstat command executed successfully and output was sent,
+              False if any error occurred during execution.
+
+    Note:
+        - The '-tuln' flags show TCP/UDP listening ports in numeric format
+        - May not work on Windows systems if netstat is not available
+        - All errors (including command output) are sent back through the socket
+    """
     try:
         result = subprocess.run(
             ["netstat", "-tuln"], capture_output=True, text=True, check=True
