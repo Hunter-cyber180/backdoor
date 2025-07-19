@@ -691,6 +691,22 @@ def get_system_info(socket):
 
 
 def handle_sysinfo_command(socket) -> bool:
+    """
+    Handles the system information command by gathering system details and sending them through the socket.
+
+    This function collects various system metrics (CPU, RAM, platform info, etc.), converts them to JSON format,
+    and sends them to the connected client via the provided socket. It handles potential connection errors
+    and other exceptions gracefully.
+
+    Args:
+        socket: A connected socket object used to send the system information to the client.
+
+    Returns:
+        bool: True if the operation was successful, False if any error occurred during the process.
+
+    Note:
+        The function will send error messages through the socket if any failures occur during execution.
+    """
     try:
         system_info = get_system_info(socket)
         info_json = json.dumps(system_info)
