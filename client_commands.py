@@ -882,5 +882,10 @@ def send_clipboard(
                 socket_send(socket, "Clipboard is empty")
                 return True
 
+            data = {"type": "clipboard", "content": clipboard_content}
+            json_data = json.dumps(data, ensure_ascii=False)
+            socket_send(socket, json_data)
+            return True
+
         except:
             pass
