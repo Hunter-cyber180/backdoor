@@ -771,6 +771,28 @@ def execute_netstat(socket: socket.socket) -> bool:
 
 
 def kill_process(socket: socket.socket, command: str) -> bool:
+    """
+    Kills a specified process by its PID and reports the result through the socket.
+
+    This function parses a kill command (format: 'kill <PID>'), attempts to terminate
+    the specified process using the system's kill command, and sends success/error
+    messages back through the socket connection. Handles various error cases including
+    invalid PIDs, permission issues, and platform compatibility problems.
+
+    Args:
+        socket (socket.socket): Connected socket for sending responses/errors
+        command (str): The kill command string (expected format: 'kill <PID>')
+
+    Returns:
+        bool: True if process was successfully killed,
+              False if any error occurred (with reason sent via socket)
+
+    Note:
+        - Requires proper permissions to kill processes
+        - May not work on Windows systems
+        - Follows standard Unix kill command behavior
+        - All outcomes (success/errors) are communicated through the socket
+    """
     try:
         match = re.search(r"kill\s+(\d+)", command)
         if not match:
