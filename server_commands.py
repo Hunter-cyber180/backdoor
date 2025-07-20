@@ -36,6 +36,20 @@ def handle_download(client_socket, command):
                     chunk = base64.b64decode(chunk_data)
                     fp.write(chunk)
                     received_bytes += len(chunk)
+
+            if os.path.getsize(file_path) != file_info["size"]:
+                os.remove(file_path)
+                error_msg = "Error: File size mismatch"
+                print(colored(error_msg, "red"))
+                return False
+
+            print(
+                colored(
+                    f"[+] File '{file_path}' downloaded ({file_info['size']/1024/1024:.2f}MB)",
+                    "green",
+                )
+            )
+            return True
         except:
             pass
     except:
