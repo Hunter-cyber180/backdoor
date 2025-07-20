@@ -12,9 +12,13 @@ def handle_download(client_socket, command):
 
         try:
             file_info = ast.literal_eval(socket_recv(client_socket))
-            if not isinstance(file_info, dict) or 'name' not in file_info or 'size' not in file_info:
+            if (
+                not isinstance(file_info, dict)
+                or "name" not in file_info
+                or "size" not in file_info
+            ):
                 raise ValueError("Invalid file info format")
-                
+
         except Exception as e:
             print(colored(f"[!] Error decoding file info: {str(e)}", "red"))
             return False
@@ -26,16 +30,13 @@ def handle_download(client_socket, command):
                 received_bytes = 0
                 while received_bytes < file_info["size"]:
                     chunk_data = socket_recv(client_socket)
-
                     if (
                         chunk_data.startswith("Error")
                         or chunk_data == "[+] File Transfer Complete"
                     ):
                         break
-
-                    chunk = base64.b64decode(chunk_data)
-                    fp.write(chunk)
-                    received_bytes += len(chunk)
+                    fp.write(chunk_data)
+                    received_bytes += len(chunk_data)
 
             if os.path.getsize(file_path) != file_info["size"]:
                 os.remove(file_path)
