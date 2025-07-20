@@ -1,9 +1,36 @@
 from socket_handlers import socket_recv
 from termcolor import colored
-import base64, os, ast
+import os, ast
 
 
 def handle_download(client_socket, command) -> bool:
+    """
+    Handles file download from a client socket.
+
+    Args:
+        client_socket: The socket connection to receive data from.
+        command: The download command string (may contain optional file path).
+
+    Returns:
+        bool: True if download was successful, False otherwise.
+
+    Process:
+        1. Receives initial file info data from the socket
+        2. Validates the file information (name and size)
+        3. Uses the provided path from command or defaults to the sent filename
+        4. Receives file data in chunks and writes to disk
+        5. Verifies the final file size matches the expected size
+        6. Cleans up partial files if any errors occur
+
+    Error Handling:
+        - Prints colored error messages for various failure cases
+        - Removes partially downloaded files on failure
+        - Handles permission errors, size mismatches, and network issues
+
+    Example:
+        Successful download prints: "[+] File 'example.txt' downloaded (1.23MB)"
+        Failed download prints error messages in red.
+    """
     try:
         file_info_data = socket_recv(client_socket)
         if file_info_data.startswith("Error"):
