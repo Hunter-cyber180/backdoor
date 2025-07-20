@@ -32,13 +32,19 @@ def handle_download(client_socket, command) -> bool:
         Failed download prints error messages in red.
     """
     try:
+        # Receive initial file info data from the socket
         file_info_data = socket_recv(client_socket)
+
+        # Check if server returned an error message
         if file_info_data.startswith("Error"):
             print(colored(file_info_data, "red"))
             return False
 
         try:
+            # Parse the file information (name and size) sent by the server
             file_info = ast.literal_eval(socket_recv(client_socket))
+
+            # Validate the file info structure
             if (
                 not isinstance(file_info, dict)
                 or "name" not in file_info
@@ -50,27 +56,37 @@ def handle_download(client_socket, command) -> bool:
             print(colored(f"[!] Error decoding file info: {str(e)}", "red"))
             return False
 
+        # Use either the path from command or default to the sent filename
         file_path = command[9:].strip() or file_info["name"]
 
         try:
+            # Open file in binary write mode to save downloaded data
             with open(file_path, "wb") as fp:
                 received_bytes = 0
+
+                # Receive file data in chunks until complete
                 while received_bytes < file_info["size"]:
                     chunk_data = socket_recv(client_socket)
+
+                    # Check for transfer errors or completion message
                     if (
                         chunk_data.startswith("Error")
                         or chunk_data == "[+] File Transfer Complete"
                     ):
                         break
+
+                    # Write received data to file
                     fp.write(chunk_data)
                     received_bytes += len(chunk_data)
 
+            # Verify downloaded file size matches expected size
             if os.path.getsize(file_path) != file_info["size"]:
-                os.remove(file_path)
+                os.remove(file_path)  # Remove corrupted/incomplete file
                 error_msg = "Error: File size mismatch"
                 print(colored(error_msg, "red"))
                 return False
 
+            # Success message with file size in MB
             print(
                 colored(
                     f"[+] File '{file_path}' downloaded ({file_info['size']/1024/1024:.2f}MB)",
@@ -79,19 +95,22 @@ def handle_download(client_socket, command) -> bool:
             )
             return True
 
+        # Handle specific error cases
         except PermissionError:
             error_msg = "Error: Permission denied"
         except Exception as e:
             error_msg = f"Error: {str(e)}"
+            # Cleanup partial download if exists
             try:
                 if os.path.exists(file_path):
                     os.remove(file_path)
             except:
-                pass
+                pass  # Ignore cleanup errors
 
         print(colored(error_msg, "red"))
         return False
 
     except Exception as e:
+        # Catch-all for any unexpected errors
         print(colored(f"Download failed: {e}", "red"))
         return False
