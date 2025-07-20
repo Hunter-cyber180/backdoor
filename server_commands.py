@@ -3,7 +3,7 @@ from termcolor import colored
 import base64, os, ast
 
 
-def handle_download(client_socket, command):
+def handle_download(client_socket, command) -> bool:
     try:
         file_info_data = socket_recv(client_socket)
         if file_info_data.startswith("Error"):
