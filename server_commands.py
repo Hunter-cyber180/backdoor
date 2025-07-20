@@ -50,7 +50,20 @@ def handle_download(client_socket, command):
                 )
             )
             return True
-        except:
-            pass
-    except:
-        pass
+
+        except PermissionError:
+            error_msg = "Error: Permission denied"
+        except Exception as e:
+            error_msg = f"Error: {str(e)}"
+            try:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except:
+                pass
+
+        print(colored(error_msg, "red"))
+        return False
+
+    except Exception as e:
+        print(colored(f"Download failed: {e}", "red"))
+        return False
