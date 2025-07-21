@@ -35,7 +35,9 @@ def run_server(host, port):
             pass
         # * Upload Command
         elif command[:6] == "upload":
-            pass
+            uploaded_data = handle_upload(client_socket, command)
+            if not uploaded_data:
+                continue
         # * Other Commands
         else:
             pass
