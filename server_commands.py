@@ -117,6 +117,39 @@ def handle_download(client_socket, command) -> bool:
 
 
 def handle_upload(client_socket, command) -> bool:
+    """
+    Handle file upload operation from server to client with comprehensive error handling.
+
+    This function reads the specified file from the server, encodes it in base64,
+    and sends it to the client. It performs various validations and provides detailed
+    error feedback to both client and server.
+
+    Parameters:
+        client_socket (socket.socket): The socket object connected to the client
+        command (str): The full upload command string (e.g., "upload /path/to/file")
+
+    Returns:
+        bool:
+            - True if file was successfully read and sent to client
+            - False if any error occurred during the process
+
+    Raises:
+        This function catches all exceptions internally and converts them to error messages,
+        so it doesn't raise any exceptions to the caller.
+
+    Examples:
+        >>> # In server's command handling loop:
+        >>> if command.startswith("upload"):
+        >>>     if not handle_upload(client_socket, command):
+        >>>         continue  # Skip further processing if upload failed
+        >>>     # Continue with other operations
+
+    Notes:
+        - The function expects the file data to be small enough to be read into memory at once
+        - Uses base64 encoding for reliable binary data transfer
+        - Includes security checks against path traversal attempts
+        - Provides detailed error messages to both client and server
+    """
     try:
         file_path = command[7:].strip()
         if not file_path:
