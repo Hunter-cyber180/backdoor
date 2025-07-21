@@ -211,5 +211,25 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
             print(colored(error_msg, "red"))
             return False
 
+        try:
+            decoded_data = base64.b64decode(data)
+
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+            with open(save_path, "wb") as fp:
+                fp.write(decoded_data)
+                fp.close()
+
+            if os.path.getsize(save_path) == len(decoded_data):
+                print(colored(f"Screenshot successfully saved to {save_path}", "green"))
+                return True
+            else:
+                error_msg = "[!] Error: Screenshot file size mismatch after save"
+                print(colored(error_msg, "red"))
+                os.remove(save_path)  # Clean up corrupted file
+                return False
+
+        except:
+            pass
     except Exception as e:
         pass
