@@ -151,26 +151,31 @@ def handle_upload(client_socket, command) -> bool:
         - Provides detailed error messages to both client and server
     """
     try:
+        # Safely extract file path from command
         file_path = command[7:].strip()
         if not file_path:
             print(colored("Error: No file path specified", "red"))
             return False
 
+        # Basic security check for file path
         if any(char in file_path for char in ["..", "~"]) or not os.path.basename(
             file_path
         ):
             print(colored("Error: Invalid file path", "red"))
             return False
 
+        # Check if file exists
         if not os.path.exists(file_path):
             print(colored(f"Error: File {file_path} not found", "red"))
             return False
 
+        # Read and send file data
         try:
             with open(file_path, "rb") as fp:
                 file_data = fp.read()
                 socket_send(client_socket, base64.b64encode(file_data))
 
+            # Wait for client response
             client_response = socket_recv(client_socket)
             if client_response.startswith("Error"):
                 print(colored(client_response, "red"))
@@ -179,11 +184,13 @@ def handle_upload(client_socket, command) -> bool:
                 print(colored(client_response, "green"))
                 return True
 
+        # Handling IO errors
         except IOError as e:
             error_msg = f"Error: Failed to read file - {str(e)}"
             print(colored(error_msg, "red"))
             return False
 
+    # Handling other errors
     except Exception as e:
         error_msg = f"Error: Unexpected error during upload - {str(e)}"
         print(colored(error_msg, "red"))
