@@ -147,7 +147,11 @@ def handle_upload(client_socket, command) -> bool:
                 return True
 
         except IOError as e:
-            pass
+            error_msg = f"Error: Failed to read file - {str(e)}"
+            print(colored(error_msg, "red"))
+            return False
 
     except Exception as e:
-        pass
+        error_msg = f"Error: Unexpected error during upload - {str(e)}"
+        print(colored(error_msg, "red"))
+        return False
