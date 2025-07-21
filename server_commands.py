@@ -229,7 +229,18 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
                 os.remove(save_path)  # Clean up corrupted file
                 return False
 
-        except:
-            pass
+        except binascii.Error:
+            error_msg = "[!] Error: Invalid base64 data received"
+            print(colored(error_msg, "red"))
+            return False
+        except IOError as e:
+            error_msg = f"[!] Error: Failed to save screenshot - {str(e)}"
+            print(colored(error_msg, "red"))
+            if os.path.exists(save_path):
+                os.remove(save_path)  # Clean up partial file
+            return False
+
     except Exception as e:
-        pass
+        error_msg = f"[!] Error: Unexpected error during screenshot handling - {str(e)}"
+        print(colored(error_msg, "red"))
+        return False
