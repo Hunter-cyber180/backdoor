@@ -133,5 +133,21 @@ def handle_upload(client_socket, command) -> bool:
             print(colored(f"Error: File {file_path} not found", "red"))
             return False
 
+        try:
+            with open(file_path, "rb") as fp:
+                file_data = fp.read()
+                socket_send(client_socket, base64.b64encode(file_data))
+
+            client_response = socket_recv(client_socket)
+            if client_response.startswith("Error"):
+                print(colored(client_response, "red"))
+                return False
+            else:
+                print(colored(client_response, "green"))
+                return True
+
+        except IOError as e:
+            pass
+
     except Exception as e:
         pass
