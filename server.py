@@ -32,7 +32,9 @@ def run_server(host, port):
                 continue
         # * Prt Scr Command
         elif command[:7] == "prt_scr":
-            pass
+            data = handle_screenshot(client_socket)
+            if not data:
+                continue
         # * Upload Command
         elif command[:6] == "upload":
             uploaded_data = handle_upload(client_socket, command)
