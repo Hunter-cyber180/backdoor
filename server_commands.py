@@ -198,7 +198,29 @@ def handle_upload(client_socket, command) -> bool:
 
 
 def handle_screenshot(client_socket, save_path="screenshot.png"):
+    """
+    Handle screenshot reception from client with comprehensive error handling.
+    
+    This function receives screenshot data from the client, decodes it from base64,
+    and saves it to the specified file path. It provides detailed error feedback
+    and validation.
 
+    Parameters:
+        client_socket (socket.socket): The socket object connected to the client
+        save_path (str): Path to save the received screenshot (default: "screenshot.png")
+        
+    Returns:
+        bool: 
+            - True if screenshot was successfully received and saved
+            - False if any error occurred during the process
+            
+    Examples:
+        >>> # In server's command handling loop:
+        >>> if command == "prt_screen":
+        >>>     if not handle_screenshot(client_socket):
+        >>>         continue  # Skip further processing if failed
+        >>>     # Continue with other operations
+    """
     try:
         data = socket_recv(client_socket)
 
