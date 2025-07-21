@@ -200,7 +200,7 @@ def handle_upload(client_socket, command) -> bool:
 def handle_screenshot(client_socket, save_path="screenshot.png"):
     """
     Handle screenshot reception from client with comprehensive error handling.
-    
+
     This function receives screenshot data from the client, decodes it from base64,
     and saves it to the specified file path. It provides detailed error feedback
     and validation.
@@ -208,12 +208,12 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
     Parameters:
         client_socket (socket.socket): The socket object connected to the client
         save_path (str): Path to save the received screenshot (default: "screenshot.png")
-        
+
     Returns:
-        bool: 
+        bool:
             - True if screenshot was successfully received and saved
             - False if any error occurred during the process
-            
+
     Examples:
         >>> # In server's command handling loop:
         >>> if command == "prt_screen":
@@ -222,8 +222,10 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
         >>>     # Continue with other operations
     """
     try:
+        # Receive screenshot data from client
         data = socket_recv(client_socket)
 
+        # Check for error messages from client
         if data.startswith("[!] Error"):
             print(colored(data, "red"))
             return False
@@ -234,14 +236,18 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
             return False
 
         try:
+            # Decode and save the screenshot
             decoded_data = base64.b64decode(data)
 
+            # Create directory if needed
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
+            # Write file with validation
             with open(save_path, "wb") as fp:
                 fp.write(decoded_data)
                 fp.close()
 
+            # Verify file was written correctly
             if os.path.getsize(save_path) == len(decoded_data):
                 print(colored(f"Screenshot successfully saved to {save_path}", "green"))
                 return True
@@ -251,6 +257,7 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
                 os.remove(save_path)  # Clean up corrupted file
                 return False
 
+        #  Handle binascii and IO errors
         except binascii.Error:
             error_msg = "[!] Error: Invalid base64 data received"
             print(colored(error_msg, "red"))
@@ -262,6 +269,7 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
                 os.remove(save_path)  # Clean up partial file
             return False
 
+    # Handle other errors
     except Exception as e:
         error_msg = f"[!] Error: Unexpected error during screenshot handling - {str(e)}"
         print(colored(error_msg, "red"))
