@@ -1,6 +1,6 @@
-from socket_handlers import socket_recv
+from socket_handlers import socket_recv, socket_send
 from termcolor import colored
-import os, ast
+import os, ast, base64
 
 
 def handle_download(client_socket, command) -> bool:
@@ -114,3 +114,24 @@ def handle_download(client_socket, command) -> bool:
         # Catch-all for any unexpected errors
         print(colored(f"Download failed: {e}", "red"))
         return False
+
+
+def handle_upload(client_socket, command) -> bool:
+    try:
+        file_path = command[7:].strip()
+        if not file_path:
+            print(colored("Error: No file path specified", "red"))
+            return False
+
+        if any(char in file_path for char in ["..", "~"]) or not os.path.basename(
+            file_path
+        ):
+            print(colored("Error: Invalid file path", "red"))
+            return False
+
+        if not os.path.exists(file_path):
+            print(colored(f"Error: File {file_path} not found", "red"))
+            return False
+
+    except Exception as e:
+        pass
