@@ -42,7 +42,11 @@ def run_server(host, port):
                 continue
         # * Other Commands
         else:
-            pass
+            data = socket_recv(client_socket)
+            if not data.startswith("Error") or not data.startswith("[!]"):
+                print(colored("green", data))
+            else:
+                print(colored("red", data))
 
     client_socket.close()
     server_socket.close()
