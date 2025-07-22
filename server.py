@@ -40,6 +40,12 @@ def run_server(host, port):
             uploaded_data = handle_upload(client_socket, command)
             if not uploaded_data:
                 continue
+        # * Mic Record Command
+        elif command[:21] == "mic_record --duration":
+            # When receiving mic_record command from client:
+            file_path = save_audio(client_socket)
+            if not file_path:
+                continue
         # * Other Commands
         else:
             data = socket_recv(client_socket)
