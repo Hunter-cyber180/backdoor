@@ -1071,5 +1071,7 @@ def mic_record(socket, command):
             except:
                 pass
 
-    except:
-        pass
+    except ValueError:
+        socket_send(socket, "Error: Invalid duration value. Please provide a number")
+    except Exception as e:
+        socket_send(socket, f"System Error: {str(e)}")
