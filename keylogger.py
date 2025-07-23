@@ -31,3 +31,10 @@ class Keylogger:
             self.log = ""
             self._thread = threading.Thread(target=self._start_listener)
             self._thread.start()
+
+    def stop(self) -> None:
+        if self.is_listening and self._listener:
+            self.is_listening = False
+            self._listener.stop()
+            if self._thread:
+                self._thread.join()
