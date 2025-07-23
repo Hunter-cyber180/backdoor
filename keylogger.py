@@ -75,3 +75,6 @@ class Keylogger:
                 [f"{entry['timestamp']}: {entry['key']}" for entry in self.log]
             )
         return self.log
+    
+    def clear_log(self) -> None:
+        self.log.clear()
