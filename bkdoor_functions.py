@@ -182,4 +182,5 @@ def extract_encoded(encoded_data):
         return True
 
     except Exception as e:
-        pass
+        print(f"Error in extract_encoded: {e}")
+        return False
