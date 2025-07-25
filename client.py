@@ -111,5 +111,6 @@ def main():
                 time.sleep(30) # Retry after same interval
 
 
-# if "__main__" == __name__:
-#     run(host="hunterserver.com", port=6018)
+# Entry point of the script
+if "__main__" == __name__:
+    main()
